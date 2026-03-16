@@ -1,0 +1,53 @@
+export const feedPosts = [
+  {
+    id: 1,
+    user: { name: 'Nisha Kapoor', username: 'nisha.creates', avatar: 'NK', gradient: 'linear-gradient(135deg,#e8c97e,#c96f6f)' },
+    image: '🌅',
+    imageBg: 'linear-gradient(135deg,#1a1208,#3d2b10)',
+    caption: 'Golden hour never gets old. There\'s something about that warm light that just makes everything feel alive. ✨',
+    likes: 1842,
+    comments: 47,
+    time: '2 hours ago',
+    tags: ['#photography', '#goldenhour', '#inspira'],
+    reach: '14.2k',        // ← Inspira shows reach — Instagram hides this
+    saved: false,
+    liked: false,
+  },
+  {
+    id: 2,
+    user: { name: 'Arjun Lens', username: 'arjun.lens', avatar: 'AL', gradient: 'linear-gradient(135deg,#7eb8e8,#5a7a9e)' },
+    image: '🌃',
+    imageBg: 'linear-gradient(135deg,#0a1520,#1e3a5f)',
+    caption: 'The city never sleeps and neither do I when there\'s light like this 🌃',
+    likes: 3291,
+    comments: 89,
+    time: '5 hours ago',
+    tags: ['#nightphotography', '#city', '#urban'],
+    reach: '28.5k',
+    saved: false,
+    liked: false,
+  },
+  {
+    id: 3,
+    user: { name: 'Ananya Studio', username: 'ananya.studio', avatar: 'AS', gradient: 'linear-gradient(135deg,#6fcf97,#4a9e6a)' },
+    image: '🌿',
+    imageBg: 'linear-gradient(135deg,#0f1a0f,#1e3a1e)',
+    caption: 'Slow mornings, green views, and a cup of silence 🌿 This is what I create for.',
+    likes: 5103,
+    comments: 124,
+    time: '8 hours ago',
+    tags: ['#nature', '#minimal', '#peace'],
+    reach: '41.8k',
+    saved: false,
+    liked: false,
+  },
+]
+
+export const feedStories = [
+  { id: 1, username: 'your story', avatar: '+', gradient: 'linear-gradient(135deg,#2a2a2a,#1a1a1a)', isYours: true },
+  { id: 2, username: 'nisha.creates', avatar: 'NK', gradient: 'linear-gradient(135deg,#e8c97e,#c96f6f)', hasNew: true },
+  { id: 3, username: 'arjun.lens', avatar: 'AL', gradient: 'linear-gradient(135deg,#7eb8e8,#5a7a9e)', hasNew: true },
+  { id: 4, username: 'ananya.studio', avatar: 'AS', gradient: 'linear-gradient(135deg,#6fcf97,#4a9e6a)', hasNew: false },
+  { id: 5, username: 'rohan.travels', avatar: 'RT', gradient: 'linear-gradient(135deg,#c96f6f,#8e4a4a)', hasNew: true },
+  { id: 6, username: 'maya.art', avatar: 'MA', gradient: 'linear-gradient(135deg,#9b8ede,#6a5acd)', hasNew: false },
+]
