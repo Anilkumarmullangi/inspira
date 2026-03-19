@@ -7,6 +7,7 @@ import Profile from './pages/Profile'
 import Notifications from './pages/Notifications'
 import Messages from './pages/Messages'
 import Reels from './pages/Reels'
+import Explore from './pages/Explore'
 
 export default function App() {
   return (
@@ -20,7 +21,7 @@ export default function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/reels" element={<Reels />} />
-
+        <Route path="/explore" element={<Explore />} />
       </Routes>
     </BrowserRouter>
   )

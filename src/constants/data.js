@@ -216,3 +216,47 @@ export const reelsData = [
     tags:['#art','#painting','#timelapse'],
   },
 ]
+
+export const exploreCategories = [
+  { id:'all', label:'All', icon:'✦' },
+  { id:'photography', label:'Photography', icon:'📸' },
+  { id:'travel', label:'Travel', icon:'✈️' },
+  { id:'architecture', label:'Architecture', icon:'🏛' },
+  { id:'nature', label:'Nature', icon:'🌿' },
+  { id:'food', label:'Food', icon:'☕' },
+  { id:'art', label:'Art', icon:'🎨' },
+  { id:'fashion', label:'Fashion', icon:'✨' },
+  { id:'music', label:'Music', icon:'🎵' },
+]
+
+export const explorePosts = [
+  { id:1, emoji:'🌅', bg:'linear-gradient(135deg,#1a1208,#3d2b10)', likes:4820, comments:92, user:'nisha.creates', size:'large', category:'photography' },
+  { id:2, emoji:'🌃', bg:'linear-gradient(135deg,#0a1520,#1e3a5f)', likes:9210, comments:234, user:'arjun.lens', size:'small', category:'photography' },
+  { id:3, emoji:'🌿', bg:'linear-gradient(135deg,#0f1a0f,#1e3a1e)', likes:3140, comments:54, user:'ananya.studio', size:'small', category:'nature' },
+  { id:4, emoji:'🏛', bg:'linear-gradient(135deg,#12120a,#2a2a10)', likes:6720, comments:143, user:'urban.frames', size:'small', category:'architecture' },
+  { id:5, emoji:'🎨', bg:'linear-gradient(135deg,#1a0f2a,#2a1a4a)', likes:12400, comments:389, user:'maya.art', size:'large', category:'art' },
+  { id:6, emoji:'✈️', bg:'linear-gradient(135deg,#0a1520,#1e3a5f)', likes:8930, comments:201, user:'rohan.travels', size:'small', category:'travel' },
+  { id:7, emoji:'☕', bg:'linear-gradient(135deg,#1a1210,#3a2218)', likes:2840, comments:67, user:'cafe.moments', size:'small', category:'food' },
+  { id:8, emoji:'🌌', bg:'linear-gradient(135deg,#0f0f1a,#1e1e3a)', likes:15600, comments:421, user:'cosmos.lens', size:'large', category:'photography' },
+  { id:9, emoji:'🌺', bg:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', likes:5210, comments:98, user:'flora.studio', size:'small', category:'nature' },
+  { id:10, emoji:'🏙', bg:'linear-gradient(135deg,#1a1a12,#3a3a20)', likes:7840, comments:167, user:'city.frames', size:'small', category:'architecture' },
+  { id:11, emoji:'🌊', bg:'linear-gradient(135deg,#0a1a15,#1e3a30)', likes:9320, comments:248, user:'ocean.eye', size:'small', category:'nature' },
+  { id:12, emoji:'🎵', bg:'linear-gradient(135deg,#1a0f2a,#3a1a4a)', likes:4560, comments:112, user:'sound.visual', size:'large', category:'music' },
+  { id:13, emoji:'🌸', bg:'linear-gradient(135deg,#1a0f15,#3a1e2a)', likes:6780, comments:189, user:'bloom.studio', size:'small', category:'nature' },
+  { id:14, emoji:'✨', bg:'linear-gradient(135deg,#1a1a0f,#3a3a1e)', likes:11200, comments:334, user:'style.collective', size:'small', category:'fashion' },
+  { id:15, emoji:'🦋', bg:'linear-gradient(135deg,#0f1520,#1e2a3a)', likes:8940, comments:276, user:'nature.lens', size:'small', category:'nature' },
+]
+
+export const trendingTopics = [
+  { tag:'#goldenhour', posts:'48.2k', growth:'+12%' },
+  { tag:'#urbanminimal', posts:'23.1k', growth:'+28%' },
+  { tag:'#slowliving', posts:'19.4k', growth:'+8%' },
+  { tag:'#architecturephotography', posts:'34.7k', growth:'+15%' },
+  { tag:'#analogfilm', posts:'12.9k', growth:'+41%' },
+]
+
+export const suggestedCreators = [
+  { name:'Cosmos Lens', username:'cosmos.lens', avatar:'CL', gradient:'linear-gradient(135deg,#0f0f1a,#1e1e3a)', followers:'124k', category:'Astrophotography' },
+  { name:'Flora Studio', username:'flora.studio', avatar:'FS', gradient:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', followers:'89k', category:'Nature & Botanicals' },
+  { name:'Urban Frames', username:'urban.frames', avatar:'UF', gradient:'linear-gradient(135deg,#12120a,#2a2a10)', followers:'67k', category:'Architecture' },
+]
