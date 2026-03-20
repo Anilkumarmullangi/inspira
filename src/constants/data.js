@@ -260,3 +260,39 @@ export const suggestedCreators = [
   { name:'Flora Studio', username:'flora.studio', avatar:'FS', gradient:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', followers:'89k', category:'Nature & Botanicals' },
   { name:'Urban Frames', username:'urban.frames', avatar:'UF', gradient:'linear-gradient(135deg,#12120a,#2a2a10)', followers:'67k', category:'Architecture' },
 ]
+
+export const storiesData = [
+  {
+    id:1,
+    user:{ name:'Nisha Kapoor', username:'nisha.creates', avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)', verified:true },
+    stories:[
+      { id:1, emoji:'🌅', bg:'linear-gradient(135deg,#1a1208,#3d2b10)', caption:'Golden hour never gets old ✨', location:'Hyderabad, India', duration:5, viewers:1842, type:'image' },
+      { id:2, emoji:'☕', bg:'linear-gradient(135deg,#1a1210,#3a2218)', caption:'Morning rituals 🌿', location:'Home Studio', duration:5, viewers:1203, type:'image' },
+      { id:3, emoji:'🎨', bg:'linear-gradient(135deg,#1a0f2a,#2a1a4a)', caption:'Working on something new...', duration:5, viewers:987, type:'image' },
+    ]
+  },
+  {
+    id:2,
+    user:{ name:'Arjun Lens', username:'arjun.lens', avatar:'AL', gradient:'linear-gradient(135deg,#7eb8e8,#5a7a9e)', verified:false },
+    stories:[
+      { id:1, emoji:'🌃', bg:'linear-gradient(135deg,#0a1520,#1e3a5f)', caption:'The city never sleeps 🌃', location:'Mumbai, India', duration:5, viewers:3291, type:'image' },
+      { id:2, emoji:'🏙', bg:'linear-gradient(135deg,#1a1a12,#3a3a20)', caption:'Urban geometry 📐', duration:5, viewers:2847, type:'image' },
+    ]
+  },
+  {
+    id:3,
+    user:{ name:'Ananya Studio', username:'ananya.studio', avatar:'AS', gradient:'linear-gradient(135deg,#6fcf97,#4a9e6a)', verified:true },
+    stories:[
+      { id:1, emoji:'🌿', bg:'linear-gradient(135deg,#0f1a0f,#1e3a1e)', caption:'Slow mornings 🌿', duration:5, viewers:5103, type:'image' },
+    ]
+  },
+  {
+    id:4,
+    user:{ name:'Maya Art', username:'maya.art', avatar:'MA', gradient:'linear-gradient(135deg,#9b8ede,#6a5acd)', verified:true },
+    stories:[
+      { id:1, emoji:'🎨', bg:'linear-gradient(135deg,#1a0f2a,#2a1a4a)', caption:'New painting in progress 🎨', duration:5, viewers:4201, type:'image' },
+      { id:2, emoji:'🌸', bg:'linear-gradient(135deg,#1a0f15,#3a1e2a)', caption:'Color studies 🌸', duration:5, viewers:3891, type:'image' },
+      { id:3, emoji:'✨', bg:'linear-gradient(135deg,#1a1a0f,#3a3a1e)', caption:'Final reveal tomorrow!', duration:5, viewers:5012, type:'image' },
+    ]
+  },
+]

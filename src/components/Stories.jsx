@@ -1,11 +1,16 @@
 import { feedStories } from '../constants/data'
+import { useNavigate } from 'react-router-dom'
 
 export default function Stories() {
+    const navigate = useNavigate()
+
+      
   return (
     <div style={{
       background:'#111', border:'1px solid #2a2a2a', borderRadius:'16px',
       padding:'1.25rem', marginBottom:'1.5rem',
     }}>
+      onClick={() => !story.isYours && navigate(`/stories/${story.id}`)}
       <div style={{ display:'flex', gap:'1.25rem', overflowX:'auto', paddingBottom:'0.25rem' }}>
         {feedStories.map(story => (
           <div key={story.id} style={{
