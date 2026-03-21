@@ -15,6 +15,7 @@ import Settings from './pages/Settings'
 import Monetization from './pages/Monetization'
 import Live from './pages/Live'
 import Analytics from './pages/Analytics'
+import Collections from './pages/Collections'
 
 export default function App() {
   return (
@@ -35,8 +36,9 @@ export default function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/monetization" element={<Monetization />} />
         <Route path="/live" element={<Live />} />
-<Route path="/live/:userId" element={<Live />} />
-<Route path="/analytics" element={<Analytics />} />
+        <Route path="/live/:userId" element={<Live />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/collections" element={<Collections />} />
       </Routes>
     </BrowserRouter>
   )
