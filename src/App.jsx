@@ -10,6 +10,7 @@ import Reels from './pages/Reels'
 import Explore from './pages/Explore'
 import Stories from './pages/Stories'
 import Search from './pages/Search'
+import CreatePost from './pages/CreatePost'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/explore" element={<Explore />} />
         <Route path="/stories/:userId" element={<Stories />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/create" element={<CreatePost />} />
       </Routes>
     </BrowserRouter>
   )
