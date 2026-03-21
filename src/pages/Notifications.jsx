@@ -18,7 +18,26 @@ export default function Notifications() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [notifications, setNotifications] = useState(notificationsData)
   const [followStates, setFollowStates] = useState({})
+  import { useState, useEffect } from 'react'
+import { SkeletonNotification } from '../components/Skeleton'
+import PageTransition from '../components/PageTransition'
 
+// Inside component, add:
+const [loading, setLoading] = useState(true)
+useEffect(() => {
+  const t = setTimeout(() => setLoading(false), 900)
+  return () => clearTimeout(t)
+}, [])
+
+{loading ? (
+  <div style={{ display:'flex', flexDirection:'column', gap:'2px' }}>
+    {Array.from({length:6}).map((_,i) => <SkeletonNotification key={i}/>)}
+  </div>
+) : (
+  <PageTransition>
+    {/* existing notification groups */}
+  </PageTransition>
+)}
   const markAllRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })))
   }

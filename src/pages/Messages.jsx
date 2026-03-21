@@ -1,6 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { conversations } from '../constants/data'
+import { SkeletonMessage } from '../components/Skeleton'
+
+// Add loading state:
+const [loading, setLoading] = useState(true)
+useEffect(() => {
+  const t = setTimeout(() => setLoading(false), 800)
+  return () => clearTimeout(t)
+}, [])
+
+
+// In conversation list:
+{loading ? (
+  Array.from({length:6}).map((_,i) => <SkeletonMessage key={i}/>)
+) : (
+  filtered.map(convo => (
 
 export default function Messages() {
   const [activeConvo, setActiveConvo] = useState(conversations[0])

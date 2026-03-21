@@ -1,18 +1,15 @@
-import Sidebar from '../components/Sidebar'
-import Stories from '../components/Stories'
-import Post from '../components/Post'
-import { feedPosts } from '../constants/data'
-
-
-
-
-
-
-
-
-
+import { useState, useEffect } from 'react'
+import { SkeletonPost, SkeletonStories } from '../components/Skeleton'
+import PageTransition from '../components/PageTransition'
 
 export default function Feed() {
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <div style={{
       display:'flex', minHeight:'100vh',
@@ -20,13 +17,11 @@ export default function Feed() {
     }}>
       <Sidebar />
 
-      {/* Main feed — centered, full feel */}
       <main style={{
         flex:1, padding:'2rem 3vw',
         borderRight:'1px solid #2a2a2a',
       }}>
         <div style={{ maxWidth:'640px', margin:'0 auto' }}>
-          {/* Feed header */}
           <div style={{
             display:'flex', alignItems:'center',
             justifyContent:'space-between', marginBottom:'1.5rem',
@@ -55,13 +50,34 @@ export default function Feed() {
             </div>
           </div>
 
-          <Stories />
-
-          {feedPosts.map(post => (
-            <Post key={post.id} post={post} />
-          ))}
+          {loading ? (
+            <>
+              <SkeletonStories />
+              <SkeletonPost />
+              <SkeletonPost />
+            </>
+          ) : (
+            <PageTransition>
+              <Stories />
+              {feedPosts.map(post => (
+                <Post key={post.id} post={post} />
+              ))}
+            </PageTransition>
+          )}
         </div>
       </main>
+
+      {/* Right sidebar stays the same */}
+      <aside style={{
+        width:'280px', flexShrink:0, padding:'2rem 1.5rem',
+        display:'flex', flexDirection:'column', gap:'1.25rem',
+        position:'sticky', top:0, height:'100vh', overflowY:'auto',
+      }}>
+        {/* ... rest of right panel unchanged ... */}
+      </aside>
+    </div>
+  )
+}
 
       {/* Right sidebar */}
       <aside style={{

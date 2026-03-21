@@ -16,6 +16,12 @@ import Monetization from './pages/Monetization'
 import Live from './pages/Live'
 import Analytics from './pages/Analytics'
 import Collections from './pages/Collections'
+import Shadowban from './pages/Shadowban'
+import Algorithm from './pages/Algorithm'
+import PostDetail from './pages/PostDetail'
+import Onboarding from './pages/Onboarding'
+import UserProfile from './pages/UserProfile'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -39,6 +45,12 @@ export default function App() {
         <Route path="/live/:userId" element={<Live />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/collections" element={<Collections />} />
+        <Route path="/shadowban" element={<Shadowban />} />
+        <Route path="/algorithm" element={<Algorithm />} />
+        <Route path="/post/:postId" element={<PostDetail />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/user/:username" element={<UserProfile />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

@@ -12,6 +12,9 @@ const navItems = [
   { icon:'💰', label:'Monetize', path:'/monetization' },
    { icon:'🔴', label:'Live', path:'/live' },
     { icon:'📊', label:'Analytics', path:'/analytics' },
+    { icon:'🛡', label:'Shadowban', path:'/shadowban' },
+    { icon:'🧠', label:'Algorithm', path:'/algorithm' },
+    { icon:'🔖', label:'Collections', path:'/collections' },
 ]
 
 export default function Sidebar() {
