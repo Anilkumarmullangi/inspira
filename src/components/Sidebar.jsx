@@ -11,6 +11,7 @@ const navItems = [
   { icon:'◯', label:'Profile', path:'/profile' },
   { icon:'💰', label:'Monetize', path:'/monetization' },
    { icon:'🔴', label:'Live', path:'/live' },
+    { icon:'📊', label:'Analytics', path:'/analytics' },
 ]
 
 export default function Sidebar() {
