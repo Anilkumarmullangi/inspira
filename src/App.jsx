@@ -13,6 +13,7 @@ import Search from './pages/Search'
 import CreatePost from './pages/CreatePost'
 import Settings from './pages/Settings'
 import Monetization from './pages/Monetization'
+import Live from './pages/Live'
 
 export default function App() {
   return (
@@ -32,6 +33,8 @@ export default function App() {
         <Route path="/create" element={<CreatePost />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/monetization" element={<Monetization />} />
+        <Route path="/live" element={<Live />} />
+<Route path="/live/:userId" element={<Live />} />
       </Routes>
     </BrowserRouter>
   )

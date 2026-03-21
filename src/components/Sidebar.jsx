@@ -10,6 +10,7 @@ const navItems = [
   { icon:'⊕', label:'Create', path:'/create' },
   { icon:'◯', label:'Profile', path:'/profile' },
   { icon:'💰', label:'Monetize', path:'/monetization' },
+   { icon:'🔴', label:'Live', path:'/live' },
 ]
 
 export default function Sidebar() {
