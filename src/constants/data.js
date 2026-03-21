@@ -296,3 +296,32 @@ export const storiesData = [
     ]
   },
 ]
+
+export const searchUsers = [
+  { id:1, name:'Nisha Kapoor', username:'nisha.creates', avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)', followers:'84k', category:'Photography', verified:true, following:false },
+  { id:2, name:'Arjun Lens', username:'arjun.lens', avatar:'AL', gradient:'linear-gradient(135deg,#7eb8e8,#5a7a9e)', followers:'41k', category:'Street Photography', verified:false, following:true },
+  { id:3, name:'Ananya Studio', username:'ananya.studio', avatar:'AS', gradient:'linear-gradient(135deg,#6fcf97,#4a9e6a)', followers:'120k', category:'Minimal Design', verified:true, following:false },
+  { id:4, name:'Maya Art', username:'maya.art', avatar:'MA', gradient:'linear-gradient(135deg,#9b8ede,#6a5acd)', followers:'28k', category:'Digital Art', verified:true, following:true },
+  { id:5, name:'Rohan Travels', username:'rohan.travels', avatar:'RT', gradient:'linear-gradient(135deg,#c96f6f,#8e4a4a)', followers:'41k', category:'Travel', verified:false, following:false },
+  { id:6, name:'Cosmos Lens', username:'cosmos.lens', avatar:'CL', gradient:'linear-gradient(135deg,#0f0f1a,#1e1e3a)', followers:'124k', category:'Astrophotography', verified:true, following:false },
+  { id:7, name:'Flora Studio', username:'flora.studio', avatar:'FS', gradient:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', followers:'89k', category:'Botanicals', verified:false, following:false },
+  { id:8, name:'Urban Frames', username:'urban.frames', avatar:'UF', gradient:'linear-gradient(135deg,#12120a,#2a2a10)', followers:'67k', category:'Architecture', verified:true, following:true },
+]
+
+export const searchTags = [
+  { tag:'#goldenhour', posts:'48.2k', category:'Photography' },
+  { tag:'#urbanminimal', posts:'23.1k', category:'Architecture' },
+  { tag:'#slowliving', posts:'19.4k', category:'Lifestyle' },
+  { tag:'#analogfilm', posts:'12.9k', category:'Photography' },
+  { tag:'#botanicalphotography', posts:'8.7k', category:'Nature' },
+  { tag:'#architecturephotography', posts:'34.7k', category:'Architecture' },
+  { tag:'#streetphotography', posts:'91.2k', category:'Photography' },
+  { tag:'#minimaldesign', posts:'44.8k', category:'Design' },
+]
+
+export const searchPlaces = [
+  { name:'Hyderabad, India', type:'City', posts:'284k', emoji:'🏙' },
+  { name:'Hussain Sagar Lake', type:'Landmark', posts:'42k', emoji:'🌊' },
+  { name:'Charminar', type:'Landmark', posts:'89k', emoji:'🏛' },
+  { name:'Golconda Fort', type:'Historic Site', posts:'31k', emoji:'🏰' },
+]

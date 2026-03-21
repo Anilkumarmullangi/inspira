@@ -9,6 +9,7 @@ import Messages from './pages/Messages'
 import Reels from './pages/Reels'
 import Explore from './pages/Explore'
 import Stories from './pages/Stories'
+import Search from './pages/Search'
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
         <Route path="/reels" element={<Reels />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/stories/:userId" element={<Stories />} />
-        
+        <Route path="/search" element={<Search />} />
       </Routes>
     </BrowserRouter>
   )

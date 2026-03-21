@@ -4,6 +4,7 @@ const navItems = [
   { icon:'⌂', label:'Home', path:'/feed' },
   { icon:'⊙', label:'Explore', path:'/explore' },
   { icon:'▷', label:'Reels', path:'/reels' },
+   { icon:'⌕', label:'Search', path:'/search' },
   { icon:'✉', label:'Messages', path:'/messages' },
   { icon:'⚬', label:'Notifications', path:'/notifications' },
   { icon:'⊕', label:'Create', path:'/create' },
