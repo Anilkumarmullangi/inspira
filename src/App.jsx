@@ -11,6 +11,7 @@ import Explore from './pages/Explore'
 import Stories from './pages/Stories'
 import Search from './pages/Search'
 import CreatePost from './pages/CreatePost'
+import Settings from './pages/Settings'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/stories/:userId" element={<Stories />} />
         <Route path="/search" element={<Search />} />
         <Route path="/create" element={<CreatePost />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   )

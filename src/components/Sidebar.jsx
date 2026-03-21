@@ -3,8 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 const navItems = [
   { icon:'⌂', label:'Home', path:'/feed' },
   { icon:'⊙', label:'Explore', path:'/explore' },
+  { icon:'⌕', label:'Search', path:'/search' },
   { icon:'▷', label:'Reels', path:'/reels' },
-   { icon:'⌕', label:'Search', path:'/search' },
   { icon:'✉', label:'Messages', path:'/messages' },
   { icon:'⚬', label:'Notifications', path:'/notifications' },
   { icon:'⊕', label:'Create', path:'/create' },
@@ -69,7 +69,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Mindful usage — Inspira feature Instagram doesn't have */}
+      {/* Screen time */}
       <div style={{
         background:'rgba(232,201,126,0.05)',
         border:'1px solid rgba(232,201,126,0.1)',
@@ -87,28 +87,30 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* User */}
-      <div style={{
-        display:'flex', alignItems:'center', gap:'0.65rem',
-        padding:'0.7rem 0.85rem', borderRadius:'12px',
-        border:'1px solid #2a2a2a', cursor:'pointer',
-        transition:'border-color 0.2s',
-      }}
-        onMouseEnter={e => e.currentTarget.style.borderColor='#3a3a3a'}
-        onMouseLeave={e => e.currentTarget.style.borderColor='#2a2a2a'}
-      >
+      {/* User — links to settings */}
+      <Link to="/settings" style={{ textDecoration:'none' }}>
         <div style={{
-          width:'32px', height:'32px', borderRadius:'50%',
-          background:'linear-gradient(135deg,#e8c97e,#c96f6f)',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          fontSize:'0.65rem', fontWeight:700, color:'#0a0a0a', flexShrink:0,
-        }}>You</div>
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:'0.8rem', fontWeight:500, color:'#f0ede8', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>Your Name</div>
-          <div style={{ fontSize:'0.68rem', color:'#555', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>@your.handle</div>
+          display:'flex', alignItems:'center', gap:'0.65rem',
+          padding:'0.7rem 0.85rem', borderRadius:'12px',
+          border:'1px solid #2a2a2a', cursor:'pointer',
+          transition:'border-color 0.2s',
+        }}
+          onMouseEnter={e => e.currentTarget.style.borderColor='#3a3a3a'}
+          onMouseLeave={e => e.currentTarget.style.borderColor='#2a2a2a'}
+        >
+          <div style={{
+            width:'32px', height:'32px', borderRadius:'50%',
+            background:'linear-gradient(135deg,#e8c97e,#c96f6f)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:'0.65rem', fontWeight:700, color:'#0a0a0a', flexShrink:0,
+          }}>You</div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:'0.8rem', fontWeight:500, color:'#f0ede8' }}>Your Name</div>
+            <div style={{ fontSize:'0.68rem', color:'#555' }}>@your.handle</div>
+          </div>
+          <span style={{ color:'#555', fontSize:'0.75rem' }}>⚙</span>
         </div>
-        <span style={{ color:'#555', fontSize:'0.75rem' }}>⋯</span>
-      </div>
+      </Link>
     </aside>
   )
 }
