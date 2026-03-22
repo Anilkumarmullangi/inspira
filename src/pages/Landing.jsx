@@ -227,3 +227,23 @@ export default function App() {
     </>
   )
 }
+useEffect(() => {
+  const handleScroll = () => {
+    const nav = document.querySelector('nav')
+    if (nav) {
+      if (window.scrollY > 20) {
+        nav.style.background = 'rgba(10,10,10,0.95)'
+        nav.style.backdropFilter = 'blur(20px)'
+        nav.style.borderBottom = '1px solid #2a2a2a'
+        nav.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)'
+      } else {
+        nav.style.background = 'transparent'
+        nav.style.backdropFilter = 'none'
+        nav.style.borderBottom = '1px solid transparent'
+        nav.style.boxShadow = 'none'
+      }
+    }
+  }
+  window.addEventListener('scroll', handleScroll)
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [])

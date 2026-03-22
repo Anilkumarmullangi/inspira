@@ -22,6 +22,7 @@ import PostDetail from './pages/PostDetail'
 import Onboarding from './pages/Onboarding'
 import UserProfile from './pages/UserProfile'
 import NotFound from './pages/NotFound'
+import './styles/global.css'
 
 export default function App() {
   return (
@@ -55,3 +56,8 @@ export default function App() {
     </BrowserRouter>
   )
 }
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
