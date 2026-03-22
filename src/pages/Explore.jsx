@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { exploreCategories, explorePosts, trendingTopics, suggestedCreators } from '../constants/data'
+import { useNavigate } from 'react-router-dom'
 
 export default function Explore() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
   const [hoveredPost, setHoveredPost] = useState(null)
   const [searchFocused, setSearchFocused] = useState(false)
+  const navigate = useNavigate()
 
   const filtered = explorePosts.filter(p => {
     const matchesCategory = activeCategory === 'all' || p.category === activeCategory
@@ -168,7 +170,7 @@ export default function Explore() {
 
         {/* Masonry-style grid */}
         <div style={{
-          columns:'3', columnGap:'3px',
+          columns: isMobile ? '2' : '3', columnGap:'3px',
           marginBottom:'2rem',
         }}>
           {filtered.map(post => (
@@ -176,6 +178,7 @@ export default function Explore() {
               key={post.id}
               onMouseEnter={() => setHoveredPost(post.id)}
               onMouseLeave={() => setHoveredPost(null)}
+              onClick={() => navigate('/post/1')}
               style={{
                 breakInside:'avoid', marginBottom:'3px',
                 position:'relative', cursor:'pointer',
@@ -295,11 +298,13 @@ export default function Explore() {
             textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'1rem',
           }}>Creators to discover</div>
           {suggestedCreators.map((creator, i) => (
-            <div key={creator.username} style={{
-              display:'flex', alignItems:'center', gap:'0.75rem',
-              padding:'0.65rem 0',
-              borderBottom: i < suggestedCreators.length - 1 ? '1px solid #1a1a1a' : 'none',
-            }}>
+            <div key={creator.username}
+  onClick={() => navigate(`/user/${creator.username}`)}
+  style={{
+    display:'flex', alignItems:'center', gap:'0.75rem',
+    padding:'0.65rem 0', cursor:'pointer',
+    borderBottom: i < suggestedCreators.length - 1 ? '1px solid #1a1a1a' : 'none',
+  }}>
               <div style={{
                 width:'42px', height:'42px', borderRadius:'50%',
                 background: creator.gradient, display:'flex',

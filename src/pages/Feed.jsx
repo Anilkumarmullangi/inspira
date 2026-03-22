@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react'
+import Sidebar from '../components/Sidebar'
+import Post from '../components/Post'
+import Stories from '../components/Stories'
+import { feedPosts } from '../constants/data'
 import { SkeletonPost, SkeletonStories } from '../components/Skeleton'
 import PageTransition from '../components/PageTransition'
 
 export default function Feed() {
   const [loading, setLoading] = useState(true)
+  const [feedMode, setFeedMode] = useState(0)
+  const { width } = useWindowSize()
+  const isMobile = width < 768
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 1200)
@@ -20,6 +27,7 @@ export default function Feed() {
       <main style={{
         flex:1, padding:'2rem 3vw',
         borderRight:'1px solid #2a2a2a',
+        paddingBottom: isMobile ? '80px' : '2rem',
       }}>
         <div style={{ maxWidth:'640px', margin:'0 auto' }}>
           <div style={{
@@ -35,15 +43,20 @@ export default function Feed() {
               border:'1px solid #2a2a2a', borderRadius:'100px', padding:'3px',
             }}>
               {[['✦','For You'],['🕐','Recent']].map(([icon, label], i) => (
-                <button key={label} style={{
-                  background: i === 0 ? '#e8c97e' : 'transparent',
-                  color: i === 0 ? '#0a0a0a' : '#555',
-                  border:'none', borderRadius:'100px',
-                  padding:'0.3rem 0.85rem', fontSize:'0.72rem',
-                  fontWeight: i === 0 ? 600 : 400,
-                  cursor:'pointer', fontFamily:"'Outfit',sans-serif",
-                  display:'flex', alignItems:'center', gap:'0.3rem',
-                }}>
+                <button
+                  key={label}
+                  onClick={() => setFeedMode(i)}
+                  style={{
+                    background: feedMode === i ? '#e8c97e' : 'transparent',
+                    color: feedMode === i ? '#0a0a0a' : '#555',
+                    border:'none', borderRadius:'100px',
+                    padding:'0.3rem 0.85rem', fontSize:'0.72rem',
+                    fontWeight: feedMode === i ? 600 : 400,
+                    cursor:'pointer', fontFamily:"'Outfit',sans-serif",
+                    display:'flex', alignItems:'center', gap:'0.3rem',
+                    transition:'all 0.2s',
+                  }}
+                >
                   <span>{icon}</span> {label}
                 </button>
               ))}
@@ -67,25 +80,11 @@ export default function Feed() {
         </div>
       </main>
 
-      {/* Right sidebar stays the same */}
       <aside style={{
         width:'280px', flexShrink:0, padding:'2rem 1.5rem',
         display:'flex', flexDirection:'column', gap:'1.25rem',
         position:'sticky', top:0, height:'100vh', overflowY:'auto',
       }}>
-        {/* ... rest of right panel unchanged ... */}
-      </aside>
-    </div>
-  )
-}
-
-      {/* Right sidebar */}
-      <aside style={{
-        width:'280px', flexShrink:0, padding:'2rem 1.5rem',
-        display:'flex', flexDirection:'column', gap:'1.25rem',
-        position:'sticky', top:0, height:'100vh', overflowY:'auto',
-      }}>
-        {/* Inspira advantages */}
         <div style={{
           background:'rgba(232,201,126,0.04)',
           border:'1px solid rgba(232,201,126,0.1)',
@@ -112,7 +111,6 @@ export default function Feed() {
           ))}
         </div>
 
-        {/* Suggested creators */}
         <div style={{
           background:'#111', border:'1px solid #2a2a2a',
           borderRadius:'14px', padding:'1.1rem',
@@ -153,7 +151,6 @@ export default function Feed() {
           ))}
         </div>
 
-        {/* Footer */}
         <div style={{ display:'flex', flexWrap:'wrap', gap:'0.5rem' }}>
           {['About','Privacy','Terms','Creators','Advertise'].map(l => (
             <a key={l} href="#" style={{ fontSize:'0.68rem', color:'#444', textDecoration:'none' }}>{l}</a>

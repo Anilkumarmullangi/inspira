@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { profileData, profilePosts } from '../constants/data'
 
 export default function Profile() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('posts')
   const [hoveredPost, setHoveredPost] = useState(null)
-  const [following, setFollowing] = useState(false)
 
   const tabs = [
     { id:'posts', label:'Posts', count: profileData.posts },
@@ -24,13 +24,12 @@ export default function Profile() {
 
       <main style={{ flex:1, overflowY:'auto' }}>
 
-        {/* Cover / header area */}
+        {/* Cover */}
         <div style={{
           height:'140px',
           background:'linear-gradient(135deg,#1a1208,#0f0f1a,#0a1520)',
           position:'relative',
         }}>
-          {/* Edit cover button — Inspira lets you customize, Instagram doesn't */}
           <button style={{
             position:'absolute', top:'1rem', right:'1rem',
             background:'rgba(10,10,10,0.6)', border:'1px solid #2a2a2a',
@@ -49,16 +48,13 @@ export default function Profile() {
             marginTop:'-1px', marginBottom:'1.5rem',
           }}>
             <div style={{ display:'flex', alignItems:'flex-end', gap:'1.25rem' }}>
-              {/* Avatar */}
               <div style={{
                 width:'100px', height:'100px', borderRadius:'50%',
                 background: profileData.gradient,
                 display:'flex', alignItems:'center', justifyContent:'center',
                 fontSize:'1.5rem', fontWeight:700, color:'#0a0a0a',
                 border:'4px solid #0a0a0a', flexShrink:0,
-              }}>
-                {profileData.avatar}
-              </div>
+              }}>{profileData.avatar}</div>
               <div style={{ paddingBottom:'0.5rem' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
                   <h1 style={{
@@ -80,14 +76,15 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Action buttons */}
             <div style={{ display:'flex', gap:'0.75rem', paddingBottom:'0.5rem' }}>
-              <button style={{
-                background:'transparent', border:'1px solid #2a2a2a',
-                borderRadius:'100px', padding:'0.5rem 1.25rem',
-                color:'#888', fontSize:'0.82rem', cursor:'pointer',
-                fontFamily:"'Outfit',sans-serif", transition:'all 0.2s',
-              }}
+              <button
+                onClick={() => navigate('/settings')}
+                style={{
+                  background:'transparent', border:'1px solid #2a2a2a',
+                  borderRadius:'100px', padding:'0.5rem 1.25rem',
+                  color:'#888', fontSize:'0.82rem', cursor:'pointer',
+                  fontFamily:"'Outfit',sans-serif", transition:'all 0.2s',
+                }}
                 onMouseEnter={e => { e.target.style.borderColor='#555'; e.target.style.color='#f0ede8' }}
                 onMouseLeave={e => { e.target.style.borderColor='#2a2a2a'; e.target.style.color='#888' }}
               >Edit profile</button>
@@ -113,12 +110,11 @@ export default function Profile() {
             </a>
           </div>
 
-          {/* Stats row — Inspira shows more stats than Instagram */}
+          {/* Stats */}
           <div style={{
-            display:'grid', gridTemplateColumns:'repeat(4,1fr)',
+            display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
             gap:'1px', background:'#2a2a2a', borderRadius:'14px',
-            overflow:'hidden', marginBottom:'2rem',
-            border:'1px solid #2a2a2a',
+            overflow:'hidden', marginBottom:'2rem', border:'1px solid #2a2a2a',
           }}>
             {[
               { label:'Posts', value: profileData.posts },
@@ -128,8 +124,7 @@ export default function Profile() {
             ].map(stat => (
               <div key={stat.label} style={{
                 background:'#111', padding:'1.1rem',
-                textAlign:'center', cursor:'pointer',
-                transition:'background 0.2s',
+                textAlign:'center', cursor:'pointer', transition:'background 0.2s',
               }}
                 onMouseEnter={e => e.currentTarget.style.background='#1a1a1a'}
                 onMouseLeave={e => e.currentTarget.style.background='#111'}
@@ -137,8 +132,7 @@ export default function Profile() {
                 <div style={{
                   fontFamily:"'Cormorant Garamond',serif",
                   fontSize:'1.5rem', fontWeight:600,
-                  color: stat.inspira ? '#e8c97e' : '#f0ede8',
-                  lineHeight:1,
+                  color: stat.inspira ? '#e8c97e' : '#f0ede8', lineHeight:1,
                 }}>{stat.value}</div>
                 <div style={{
                   fontSize:'0.7rem', color: stat.inspira ? '#e8c97e' : '#555',
@@ -148,10 +142,10 @@ export default function Profile() {
             ))}
           </div>
 
-          {/* Highlights — like Instagram stories highlights */}
+          {/* Highlights */}
           <div style={{ marginBottom:'2rem' }}>
             <div style={{ display:'flex', gap:'1.25rem', overflowX:'auto', paddingBottom:'0.5rem' }}>
-              {['Travel','Food','Architecture','Nature','Add'].map((hl, i) => (
+              {['Travel','Food','Architecture','Nature','Add'].map(hl => (
                 <div key={hl} style={{
                   display:'flex', flexDirection:'column',
                   alignItems:'center', gap:'0.5rem', flexShrink:0, cursor:'pointer',
@@ -160,12 +154,11 @@ export default function Profile() {
                     width:'64px', height:'64px', borderRadius:'50%',
                     border: hl === 'Add' ? '2px dashed #2a2a2a' : '2px solid #2a2a2a',
                     display:'flex', alignItems:'center', justifyContent:'center',
-                    fontSize:'1.5rem',
-                    background: hl === 'Add' ? 'transparent' : '#111',
+                    fontSize:'1.5rem', background: hl === 'Add' ? 'transparent' : '#111',
                     transition:'border-color 0.2s',
                   }}
                     onMouseEnter={e => e.currentTarget.style.borderColor='#e8c97e'}
-                    onMouseLeave={e => e.currentTarget.style.borderColor= hl === 'Add' ? '#2a2a2a' : '#2a2a2a'}
+                    onMouseLeave={e => e.currentTarget.style.borderColor='#2a2a2a'}
                   >
                     {hl === 'Travel' ? '✈️' : hl === 'Food' ? '☕' : hl === 'Architecture' ? '🏛' : hl === 'Nature' ? '🌿' : '+'}
                   </div>
@@ -178,7 +171,7 @@ export default function Profile() {
           {/* Tabs */}
           <div style={{
             display:'flex', borderBottom:'1px solid #2a2a2a',
-            marginBottom:'1.5rem', gap:'0',
+            marginBottom:'1.5rem',
           }}>
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
@@ -200,15 +193,17 @@ export default function Profile() {
             ))}
           </div>
 
-          {/* Posts grid */}
+          {/* POSTS TAB */}
           {activeTab === 'posts' && (
             <div style={{
-              display:'grid', gridTemplateColumns:'repeat(3,1fr)',
+             display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
               gap:'3px', borderRadius:'8px', overflow:'hidden',
               marginBottom:'3rem',
             }}>
               {profilePosts.map(post => (
-                <div key={post.id}
+                <div
+                  key={post.id}
+                  onClick={() => navigate(`/post/${post.id}`)}
                   onMouseEnter={() => setHoveredPost(post.id)}
                   onMouseLeave={() => setHoveredPost(null)}
                   style={{
@@ -240,7 +235,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Saved tab */}
+          {/* SAVED TAB */}
           {activeTab === 'saved' && (
             <div style={{ textAlign:'center', padding:'4rem 0', color:'#555' }}>
               <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🔖</div>
@@ -248,12 +243,32 @@ export default function Profile() {
               <p style={{ fontSize:'0.78rem', marginTop:'0.5rem', color:'#444' }}>
                 ✦ Inspira keeps your saves completely private — Instagram doesn't always.
               </p>
+              <button
+                onClick={() => navigate('/collections')}
+                style={{
+                  background:'transparent', border:'1px solid #2a2a2a',
+                  borderRadius:'100px', padding:'0.5rem 1.25rem',
+                  color:'#e8c97e', fontSize:'0.82rem', cursor:'pointer',
+                  fontFamily:"'Outfit',sans-serif", marginTop:'1rem',
+                }}
+              >View Collections →</button>
             </div>
           )}
 
-          {/* Analytics tab — Inspira exclusive, Instagram locks this */}
+          {/* ANALYTICS TAB */}
           {activeTab === 'analytics' && (
             <div style={{ marginBottom:'3rem' }}>
+              <button
+                onClick={() => navigate('/analytics')}
+                style={{
+                  background:'#e8c97e', color:'#0a0a0a', border:'none',
+                  borderRadius:'100px', padding:'0.6rem 1.5rem',
+                  fontSize:'0.82rem', fontWeight:600, cursor:'pointer',
+                  fontFamily:"'Outfit',sans-serif", marginBottom:'1.25rem',
+                  display:'block',
+                }}
+              >View full analytics dashboard →</button>
+
               <div style={{
                 background:'rgba(232,201,126,0.05)',
                 border:'1px solid rgba(232,201,126,0.1)',
@@ -263,7 +278,7 @@ export default function Profile() {
                   ✦ Free for all creators — unlike Instagram
                 </div>
                 <p style={{ fontSize:'0.82rem', color:'#666', lineHeight:1.6, margin:0 }}>
-                  Instagram locks deep analytics behind business accounts and Meta Business Suite. On Inspira, every creator gets full analytics for free.
+                  Instagram locks deep analytics behind business accounts. On Inspira, every creator gets full analytics for free.
                 </p>
               </div>
 
@@ -296,7 +311,6 @@ export default function Profile() {
                 ))}
               </div>
 
-              {/* Top posts */}
               <div style={{
                 background:'#111', border:'1px solid #2a2a2a',
                 borderRadius:'14px', padding:'1.25rem',
@@ -305,11 +319,15 @@ export default function Profile() {
                   Top performing posts
                 </div>
                 {profilePosts.slice(0,4).map((post, i) => (
-                  <div key={post.id} style={{
-                    display:'flex', alignItems:'center', gap:'0.75rem',
-                    padding:'0.65rem 0',
-                    borderBottom: i < 3 ? '1px solid #1a1a1a' : 'none',
-                  }}>
+                  <div
+                    key={post.id}
+                    onClick={() => navigate(`/post/${post.id}`)}
+                    style={{
+                      display:'flex', alignItems:'center', gap:'0.75rem',
+                      padding:'0.65rem 0', cursor:'pointer',
+                      borderBottom: i < 3 ? '1px solid #1a1a1a' : 'none',
+                    }}
+                  >
                     <div style={{
                       width:'40px', height:'40px', borderRadius:'8px',
                       background: post.bg, display:'flex', alignItems:'center',
@@ -320,9 +338,7 @@ export default function Profile() {
                         ♥ {post.likes.toLocaleString()} · 💬 {post.comments}
                       </div>
                     </div>
-                    <div style={{
-                      fontSize:'0.72rem', color:'#e8c97e', fontWeight:500,
-                    }}>
+                    <div style={{ fontSize:'0.72rem', color:'#e8c97e', fontWeight:500 }}>
                       #{i + 1} top
                     </div>
                   </div>
@@ -331,7 +347,7 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Tagged tab */}
+          {/* TAGGED TAB */}
           {activeTab === 'tagged' && (
             <div style={{ textAlign:'center', padding:'4rem 0', color:'#555' }}>
               <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🏷</div>

@@ -138,6 +138,7 @@ export default function Search() {
                     <div key={s} style={{
                       display:'flex', alignItems:'center', gap:'0.75rem',
                       padding:'0.55rem 0.5rem', borderRadius:'8px', cursor:'pointer',
+
                       transition:'background 0.15s',
                     }}
                       onMouseEnter={e => e.currentTarget.style.background='#1a1a1a'}
@@ -474,12 +475,15 @@ export default function Search() {
 
 // Reusable row components
 function UserRow({ user, followed, onFollow }) {
+  const navigate = useNavigate()
   return (
-    <div style={{
-      display:'flex', alignItems:'center', gap:'0.85rem',
-      padding:'0.75rem 0.85rem', borderRadius:'12px',
-      transition:'background 0.15s', cursor:'pointer',
-    }}
+    <div
+      onClick={() => navigate(`/user/${user.username}`)}
+      style={{
+        display:'flex', alignItems:'center', gap:'0.85rem',
+        padding:'0.75rem 0.85rem', borderRadius:'12px',
+        transition:'background 0.15s', cursor:'pointer',
+      }}
       onMouseEnter={e => e.currentTarget.style.background='#111'}
       onMouseLeave={e => e.currentTarget.style.background='transparent'}
     >
@@ -550,8 +554,10 @@ function TagRow({ tag, onClick }) {
 }
 
 function PlaceRow({ place }) {
+  const navigate = useNavigate()
   return (
-    <div style={{
+    <div onClick={() => navigate('/explore')}
+    style={{
       display:'flex', alignItems:'center', gap:'0.85rem',
       padding:'0.75rem 0.85rem', borderRadius:'12px',
       transition:'background 0.15s', cursor:'pointer',

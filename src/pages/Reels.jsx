@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { reelsData } from '../constants/data'
 
 function ReelCard({ reel, isActive }) {
+  const navigate = useNavigate()
   const [liked, setLiked] = useState(false)
   const [saved, setSaved] = useState(false)
   const [likes, setLikes] = useState(reel.likes)
@@ -111,7 +113,8 @@ function ReelCard({ reel, isActive }) {
           display:'flex', alignItems:'center',
           gap:'0.65rem', marginBottom:'0.75rem',
         }}>
-          <div style={{
+          <div  onClick={(e) => { e.stopPropagation(); navigate(`/user/${reel.user.username}`) }}
+          style={{
             width:'36px', height:'36px', borderRadius:'50%',
             background: reel.user.gradient, display:'flex',
             alignItems:'center', justifyContent:'center',
@@ -119,7 +122,8 @@ function ReelCard({ reel, isActive }) {
           }}>{reel.user.avatar}</div>
           <div style={{ flex:1 }}>
             <div style={{ display:'flex', alignItems:'center', gap:'0.35rem' }}>
-              <span style={{ fontSize:'0.88rem', fontWeight:600, color:'#f0ede8' }}>
+              <span  onClick={(e) => { e.stopPropagation(); navigate(`/user/${reel.user.username}`) }}
+              style={{ fontSize:'0.88rem', fontWeight:600, color:'#f0ede8' }}>
                 {reel.user.username}
               </span>
               {reel.user.verified && (
@@ -182,7 +186,7 @@ function ReelCard({ reel, isActive }) {
       }}>
         {/* Like */}
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'0.2rem' }}>
-          <button onClick={toggleLike} style={{
+          <button onClick={() => navigate('/post/1')} style={{
             background:'rgba(10,10,10,0.5)', backdropFilter:'blur(8px)',
             border:'1px solid rgba(255,255,255,0.1)', borderRadius:'50%',
             width:'44px', height:'44px', display:'flex', alignItems:'center',

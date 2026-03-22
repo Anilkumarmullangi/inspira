@@ -1,33 +1,80 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import useWindowSize from '../hooks/useWindowSize'
 
 const navItems = [
   { icon:'⌂', label:'Home', path:'/feed' },
   { icon:'⊙', label:'Explore', path:'/explore' },
   { icon:'⌕', label:'Search', path:'/search' },
   { icon:'▷', label:'Reels', path:'/reels' },
+  { icon:'🔴', label:'Live', path:'/live' },
   { icon:'✉', label:'Messages', path:'/messages' },
   { icon:'⚬', label:'Notifications', path:'/notifications' },
   { icon:'⊕', label:'Create', path:'/create' },
   { icon:'◯', label:'Profile', path:'/profile' },
+  { icon:'🔖', label:'Collections', path:'/collections' },
+  { icon:'📊', label:'Analytics', path:'/analytics' },
   { icon:'💰', label:'Monetize', path:'/monetization' },
-   { icon:'🔴', label:'Live', path:'/live' },
-    { icon:'📊', label:'Analytics', path:'/analytics' },
-    { icon:'🛡', label:'Shadowban', path:'/shadowban' },
-    { icon:'🧠', label:'Algorithm', path:'/algorithm' },
-    { icon:'🔖', label:'Collections', path:'/collections' },
+  { icon:'🛡', label:'Shadowban', path:'/shadowban' },
+  { icon:'🧠', label:'Algorithm', path:'/algorithm' },
+]
+
+// Bottom nav shows only the most important 5
+const mobileNavItems = [
+  { icon:'⌂', label:'Home', path:'/feed' },
+  { icon:'⊙', label:'Explore', path:'/explore' },
+  { icon:'⊕', label:'Create', path:'/create' },
+  { icon:'▷', label:'Reels', path:'/reels' },
+  { icon:'◯', label:'Profile', path:'/profile' },
 ]
 
 export default function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { width } = useWindowSize()
+  const isMobile = width < 768
 
+  // Mobile bottom nav
+  if (isMobile) {
+    return (
+      <>
+        {/* Spacer so content doesn't hide behind bottom nav */}
+        <div style={{ height:'60px' }}/>
+        <nav style={{
+          position:'fixed', bottom:0, left:0, right:0, zIndex:100,
+          background:'rgba(13,13,13,0.95)', backdropFilter:'blur(12px)',
+          borderTop:'1px solid #2a2a2a',
+          display:'flex', alignItems:'center', justifyContent:'space-around',
+          padding:'0.5rem 0 0.75rem', height:'60px',
+        }}>
+          {mobileNavItems.map(item => {
+            const active = location.pathname === item.path
+            return (
+              <Link key={item.label} to={item.path} style={{
+                display:'flex', flexDirection:'column',
+                alignItems:'center', gap:'0.2rem',
+                textDecoration:'none', color: active ? '#e8c97e' : '#555',
+                fontSize:'0.55rem', fontFamily:"'Outfit',sans-serif",
+                fontWeight: active ? 600 : 400,
+                minWidth:'44px', transition:'color 0.2s',
+              }}>
+                <span style={{ fontSize:'1.3rem' }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </>
+    )
+  }
+
+  // Desktop sidebar — unchanged
   return (
     <aside style={{
-      width:'220px', flexShrink:0, position:'sticky',
+      width:'200px', flexShrink:0, position:'sticky',
       top:0, height:'100vh', padding:'1.75rem 1.25rem',
       display:'flex', flexDirection:'column',
       borderRight:'1px solid #2a2a2a', background:'#0d0d0d',
     }}>
-      {/* Logo */}
       <Link to="/" style={{
         fontFamily:"'Cormorant Garamond',serif",
         fontSize:'1.7rem', fontWeight:600, color:'#f0ede8',
@@ -37,18 +84,17 @@ export default function Sidebar() {
         Insp<em style={{ color:'#e8c97e', fontStyle:'italic' }}>i</em>ra
       </Link>
 
-      {/* Nav items */}
       <nav style={{ display:'flex', flexDirection:'column', gap:'0.15rem', flex:1 }}>
         {navItems.map(item => {
           const active = location.pathname === item.path
           return (
             <Link key={item.label} to={item.path} style={{
               display:'flex', alignItems:'center', gap:'0.85rem',
-              padding:'0.7rem 0.9rem', borderRadius:'12px',
+              padding:'0.6rem 0.9rem', borderRadius:'12px',
               textDecoration:'none', transition:'all 0.2s',
               background: active ? 'rgba(232,201,126,0.1)' : 'transparent',
               color: active ? '#f0ede8' : '#555',
-              fontSize:'0.9rem', fontWeight: active ? 500 : 400,
+              fontSize:'0.85rem', fontWeight: active ? 500 : 400,
               borderLeft: active ? '2px solid #e8c97e' : '2px solid transparent',
             }}
               onMouseEnter={e => { if (!active) { e.currentTarget.style.background='#1a1a1a'; e.currentTarget.style.color='#888' }}}
@@ -60,14 +106,14 @@ export default function Sidebar() {
                 <span style={{
                   marginLeft:'auto', background:'#e8c97e', color:'#0a0a0a',
                   borderRadius:'100px', fontSize:'0.6rem', fontWeight:700,
-                  padding:'0.15rem 0.45rem', lineHeight:1.4,
+                  padding:'0.15rem 0.45rem',
                 }}>3</span>
               )}
               {item.label === 'Messages' && (
                 <span style={{
                   marginLeft:'auto', background:'#c96f6f', color:'white',
                   borderRadius:'100px', fontSize:'0.6rem', fontWeight:700,
-                  padding:'0.15rem 0.45rem', lineHeight:1.4,
+                  padding:'0.15rem 0.45rem',
                 }}>2</span>
               )}
             </Link>
@@ -75,7 +121,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Screen time */}
       <div style={{
         background:'rgba(232,201,126,0.05)',
         border:'1px solid rgba(232,201,126,0.1)',
@@ -93,7 +138,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* User — links to settings */}
       <Link to="/settings" style={{ textDecoration:'none' }}>
         <div style={{
           display:'flex', alignItems:'center', gap:'0.65rem',
