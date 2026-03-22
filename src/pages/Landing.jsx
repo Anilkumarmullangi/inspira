@@ -27,7 +27,7 @@ const gridCells = [
   { bg:'linear-gradient(135deg,#1a1a12,#3a3a20)', emoji:'🏙' },
 ]
 
-export default function App() {
+export default function Landing() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -66,8 +66,8 @@ export default function App() {
           </h1>
           <p className="hero-sub">Inspira is the home for visual storytellers. Discover beauty, share your perspective, and connect with a community that lives for aesthetics.</p>
           <div className="hero-actions">
-            <a href="#" className="btn btn-primary">Create your profile</a>
-            <a href="#features" className="btn btn-ghost">Explore feed</a>
+            <Link to="/signup" className="btn btn-primary">Create your profile</Link>
+            <Link to="/feed" className="btn btn-ghost">Explore feed</Link>
           </div>
           <div className="hero-proof">
             <span className="stars">★★★★★</span>
@@ -156,7 +156,7 @@ export default function App() {
           <div className="section-label"><span className="section-label-line"/>Your profile</div>
           <h2 className="section-h2">A gallery that tells your <em>story</em></h2>
           <p>Your Inspira grid is your visual identity. Every post becomes part of a living portfolio — a curated window into how you see the world.</p>
-          <a href="#" className="btn btn-primary">Start sharing</a>
+          <Link to="/signup" className="btn btn-primary">Start sharing</Link>
         </div>
       </section>
 
@@ -198,8 +198,8 @@ export default function App() {
           2 million creators are already sharing what moves them. It's your turn.
         </p>
         <div className="cta-actions" style={{position:'relative',zIndex:1}}>
-          <a href="#" className="btn btn-primary">Create free account</a>
-          <a href="#" className="btn btn-ghost">Browse without signing up</a>
+          <Link to="/signup" className="btn btn-primary">Create free account</Link>
+          <Link to="/feed" className="btn btn-ghost">Browse without signing up</Link>
         </div>
         <div className="store-btns" style={{position:'relative',zIndex:1}}>
           {[['','Download on the','App Store'],['▶','Get it on','Google Play']].map(([icon,sub,name]) => (
@@ -227,23 +227,3 @@ export default function App() {
     </>
   )
 }
-useEffect(() => {
-  const handleScroll = () => {
-    const nav = document.querySelector('nav')
-    if (nav) {
-      if (window.scrollY > 20) {
-        nav.style.background = 'rgba(10,10,10,0.95)'
-        nav.style.backdropFilter = 'blur(20px)'
-        nav.style.borderBottom = '1px solid #2a2a2a'
-        nav.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)'
-      } else {
-        nav.style.background = 'transparent'
-        nav.style.backdropFilter = 'none'
-        nav.style.borderBottom = '1px solid transparent'
-        nav.style.boxShadow = 'none'
-      }
-    }
-  }
-  window.addEventListener('scroll', handleScroll)
-  return () => window.removeEventListener('scroll', handleScroll)
-}, [])
