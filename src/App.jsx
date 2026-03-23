@@ -24,6 +24,7 @@ import UserProfile from './pages/UserProfile'
 import NotFound from './pages/NotFound'
 import './styles/global.css'
 
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -56,8 +57,3 @@ export default function App() {
     </BrowserRouter>
   )
 }
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)

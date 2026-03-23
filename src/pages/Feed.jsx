@@ -5,6 +5,7 @@ import Stories from '../components/Stories'
 import { feedPosts } from '../constants/data'
 import { SkeletonPost, SkeletonStories } from '../components/Skeleton'
 import PageTransition from '../components/PageTransition'
+import useWindowSize from '../hooks/useWindowSize'
 
 export default function Feed() {
   const [loading, setLoading] = useState(true)
