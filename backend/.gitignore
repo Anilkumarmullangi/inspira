@@ -16,3 +16,7 @@ logs/
 .DS_Store
 .vscode/
 .idea/
+
+# Local uploads and temp tests
+uploads/
+tmp_*.mjs
