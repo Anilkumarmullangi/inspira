@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 
 const API = axios.create({
   baseURL: "http://localhost:5000/api",
@@ -9,7 +9,7 @@ API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = 'Bearer ' + token;
   }
 
   return config;
@@ -31,19 +31,19 @@ export const getCurrentUser = () => API.get("/users/me");
 
 export const getPosts = () => API.get("/posts");
 
-export const createPost = async (formData) => {
+// createPost supports an optional onUploadProgress callback
+export const createPost = async (formData, onUploadProgress) => {
   const res = await API.post("/posts/create", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    onUploadProgress,
   });
 
   return res.data;
 };
 
-export const deletePost = (id) =>
-  API.delete(`/posts/${id}`);
-
+export const deletePost = (id) => API.delete(`/posts/${id}`);
 
 export const toggleLike = async (postId) => {
   const res = await API.put(`/posts/${postId}/like`);
@@ -86,3 +86,4 @@ export const uploadProfilePicture = async (formData) => {
 };
 
 export default API;
+

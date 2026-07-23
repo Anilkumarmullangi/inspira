@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toggleLike as apiToggleLike } from "../config/api";
 
 export default function Post({ post }) {
   const navigate = useNavigate();
@@ -9,16 +10,29 @@ export default function Post({ post }) {
   const [likes, setLikes] = useState(post.likes?.length || 0);
   const [showReachInfo, setShowReachInfo] = useState(false);
 
-  const toggleLike = (e) => {
-  e.stopPropagation();
+  const toggleLike = async (e) => {
+    e.stopPropagation();
 
-  setLiked((prevLiked) => {
-    setLikes((prevLikes) =>
-      prevLiked ? prevLikes - 1 : prevLikes + 1
-    );
-    return !prevLiked;
-  });
-};
+    const prevLiked = liked;
+    const prevLikes = likes;
+
+    // optimistic update
+    setLiked(!prevLiked);
+    setLikes(prevLiked ? prevLikes - 1 : prevLikes + 1);
+
+    try {
+      const res = await apiToggleLike(post._id);
+      if (res && typeof res.liked !== 'undefined') {
+        setLiked(res.liked);
+        setLikes(res.likes || 0);
+      }
+    } catch (err) {
+      // revert on failure
+      setLiked(prevLiked);
+      setLikes(prevLikes);
+      try { const toast = (await import('react-hot-toast')).default; toast.error('Failed to update like'); } catch(e){ console.error(e) }
+    }
+  };
 
   const toggleSave = (e) => {
     e.stopPropagation();

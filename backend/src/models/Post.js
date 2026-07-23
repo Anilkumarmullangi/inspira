@@ -19,6 +19,19 @@ const postSchema = new mongoose.Schema(
       maxlength: 2200,
     },
 
+    // Optional hashtags parsed from caption or provided explicitly
+    hashtags: [
+      {
+        type: String,
+      },
+    ],
+
+    // Optional location for the post (e.g., "Hyderabad")
+    location: {
+      type: String,
+      default: "",
+    },
+
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -37,6 +37,7 @@ export default function CreatePost() {
   const [postType, setPostType] = useState('post')
   const [aspectRatio, setAspectRatio] = useState('1/1')
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const handleFileChange = (e) => {
   const file = e.target.files[0];
 
@@ -79,27 +80,36 @@ export default function CreatePost() {
     }
 
     setUploading(true);
+    setUploadProgress(0);
 
     const formData = new FormData();
 
     formData.append("image", selectedMedia.file);
     formData.append("caption", caption);
+    formData.append("hashtags", tags.join(','));
+    formData.append("location", location);
 
-    const res = await createPost(formData);
+    const res = await createPost(formData, (progressEvent) => {
+      if (progressEvent && progressEvent.total) {
+        const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+        setUploadProgress(percent);
+      }
+    });
 
     console.log(res);
 
-    alert("Post created successfully!");
+    // success toast
+    try { const toast = (await import('react-hot-toast')).default; toast.success('Post created successfully!') } catch(e){ /* ignore */ }
 
     navigate("/feed");
   } catch (error) {
     console.error(error);
 
-    alert(
-      error.response?.data?.message || "Failed to create post."
-    );
+    const msg = error.response?.data?.message || error.message || "Failed to create post.";
+    try { const toast = (await import('react-hot-toast')).default; toast.error(msg) } catch(e){ alert(msg) }
   } finally {
     setUploading(false);
+    setUploadProgress(0);
   }
 };
 
@@ -222,7 +232,17 @@ export default function CreatePost() {
                         >{type.label}</button>
                       ))}
                     </div>
-                  </div>
+
+                        {/* Upload progress bar */}
+                        {uploading && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <div style={{ height: '8px', background: '#111', borderRadius: '8px', overflow: 'hidden' }}>
+                              <div style={{ width: `${uploadProgress}%`, height: '100%', background: '#e8c97e', transition: 'width 200ms' }} />
+                            </div>
+                            <div style={{ fontSize: '0.74rem', color: '#888', marginTop: '6px' }}>{uploadProgress}%</div>
+                          </div>
+                        )}
+                      </div>
 
                   {/* Media picker */}
                   {!selectedMedia ? (
