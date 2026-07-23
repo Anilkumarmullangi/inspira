@@ -2,21 +2,33 @@ import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import Post from '../components/Post'
 import Stories from '../components/Stories'
-import { feedPosts } from '../constants/data'
+import { getPosts } from "../config/api";
 import { SkeletonPost, SkeletonStories } from '../components/Skeleton'
 import PageTransition from '../components/PageTransition'
 import useWindowSize from '../hooks/useWindowSize'
 
 export default function Feed() {
-  const [loading, setLoading] = useState(true)
+const [loading, setLoading] = useState(true)
+const [posts, setPosts] = useState([])
   const [feedMode, setFeedMode] = useState(0)
   const { width } = useWindowSize()
   const isMobile = width < 768
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
-  }, [])
+  const loadPosts = async () => {
+    try {
+      const res = await getPosts();
+
+      setPosts(res.posts || []);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadPosts();
+}, []);
 
   return (
     <div style={{
@@ -73,9 +85,11 @@ export default function Feed() {
           ) : (
             <PageTransition>
               <Stories />
-              {feedPosts.map(post => (
-                <Post key={post.id} post={post} />
-              ))}
+              {
+              posts.map(post => (
+    <Post key={post._id} post={post} />
+))
+              }
             </PageTransition>
           )}
         </div>

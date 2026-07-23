@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState , useRef} from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import { createPost } from "../config/api";
 
 const STEPS = ['Media', 'Edit', 'Details', 'Schedule']
 
@@ -18,6 +19,7 @@ const emojiOptions = [
 
 export default function CreatePost() {
   const navigate = useNavigate()
+  const fileInputRef = useRef(null);
   const [step, setStep] = useState(0)
   const [selectedMedia, setSelectedMedia] = useState(null)
   const [caption, setCaption] = useState('')
@@ -34,6 +36,20 @@ export default function CreatePost() {
   const [isDraft, setIsDraft] = useState(false)
   const [postType, setPostType] = useState('post')
   const [aspectRatio, setAspectRatio] = useState('1/1')
+  const [uploading, setUploading] = useState(false);
+  const handleFileChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  const preview = {
+    file,
+    preview: URL.createObjectURL(file),
+    isUploaded: true,
+  };
+
+  setSelectedMedia(preview);
+};
 
   const addTag = () => {
     const t = tagInput.trim().replace(/^#/, '')
@@ -55,9 +71,37 @@ export default function CreatePost() {
     return true
   }
 
-  const publish = () => {
-    navigate('/feed')
+  const publish = async () => {
+  try {
+    if (!selectedMedia?.file) {
+      alert("Please select an image.");
+      return;
+    }
+
+    setUploading(true);
+
+    const formData = new FormData();
+
+    formData.append("image", selectedMedia.file);
+    formData.append("caption", caption);
+
+    const res = await createPost(formData);
+
+    console.log(res);
+
+    alert("Post created successfully!");
+
+    navigate("/feed");
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error.response?.data?.message || "Failed to create post."
+    );
+  } finally {
+    setUploading(false);
   }
+};
 
   return (
     <div style={{
@@ -199,13 +243,22 @@ export default function CreatePost() {
                         <p style={{ fontSize:'0.8rem', color:'#555', marginBottom:'1.5rem' }}>
                           JPG, PNG, MP4, MOV up to 100MB
                         </p>
-                        <button style={{
+                        <button 
+                          onClick={() => fileInputRef.current.click()}
+                        style={{
                           background:'#e8c97e', color:'#0a0a0a', border:'none',
                           borderRadius:'100px', padding:'0.65rem 1.75rem',
                           fontSize:'0.85rem', fontWeight:600, cursor:'pointer',
                           fontFamily:"'Outfit',sans-serif",
                         }}>Browse files</button>
                       </div>
+                      <input
+  ref={fileInputRef}
+  type="file"
+  accept="image/*"
+  hidden
+  onChange={handleFileChange}
+/>
 
                       {/* Pick from library (emoji placeholders) */}
                       <div style={{ fontSize:'0.72rem', color:'#555', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'0.75rem' }}>
@@ -244,7 +297,19 @@ export default function CreatePost() {
                         justifyContent:'center', fontSize:'6rem',
                         marginBottom:'1rem', position:'relative',
                       }}>
-                        {selectedMedia.emoji}
+                        {selectedMedia.isUploaded ? (
+  <img
+    src={selectedMedia.preview}
+    alt="preview"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    }}
+  />
+) : (
+  selectedMedia.emoji
+)}
                         <button
                           onClick={() => setSelectedMedia(null)}
                           style={{
@@ -297,7 +362,19 @@ export default function CreatePost() {
                     justifyContent:'center', fontSize:'6rem',
                     marginBottom:'1.5rem',
                   }}>
-                    {selectedMedia.emoji}
+                    {selectedMedia.isUploaded ? (
+  <img
+    src={selectedMedia.preview}
+    alt="preview"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    }}
+  />
+) : (
+  selectedMedia.emoji
+)}
                   </div>
 
                   {/* Filters */}
@@ -710,7 +787,23 @@ export default function CreatePost() {
                   fontSize: selectedMedia ? '4rem' : '1.5rem',
                   color: selectedMedia ? 'inherit' : '#2a2a2a',
                 }}>
-                  {selectedMedia ? selectedMedia.emoji : '📷'}
+                  {selectedMedia ? (
+  selectedMedia.isUploaded ? (
+    <img
+      src={selectedMedia.preview}
+      alt="preview"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
+  ) : (
+    selectedMedia.emoji
+  )
+) : (
+  "📷"
+)}
                 </div>
 
                 {/* Preview caption */}

@@ -7,6 +7,7 @@ export default function Profile() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('posts')
   const [hoveredPost, setHoveredPost] = useState(null)
+  const isMobile = window.innerWidth <= 768
 
   const tabs = [
     { id:'posts', label:'Posts', count: profileData.posts },

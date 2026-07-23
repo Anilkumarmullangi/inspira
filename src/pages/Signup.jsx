@@ -1,11 +1,38 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { signup } from '../config/api'
 import { Link } from 'react-router-dom'
 import InputField from '../components/InputField'
 
 export default function Signup() {
-  const [form, setForm] = useState({ name:'', username:'', email:'', password:'' })
+const navigate = useNavigate()
+
+const [form, setForm] = useState({
+  fullName: '',
+  username: '',
+  email: '',
+  password: '',
+})
   const [step, setStep] = useState(1)
-  const handle = field => e => setForm({ ...form, [field]: e.target.value })
+  const handle = field => e =>
+  setForm({ ...form, [field]: e.target.value })
+
+const handleSignup = async () => {
+  try {
+    await signup(form)
+
+    alert("Account created successfully!")
+
+    navigate("/login")
+  } catch (err) {
+    console.error(err)
+
+    alert(
+      err.response?.data?.message ||
+      "Signup failed."
+    )
+  }
+}
 
   return (
     <div style={{
@@ -68,7 +95,8 @@ export default function Signup() {
               </>
             ) : (
               <>
-                <InputField label="Full name" placeholder="Priya Kapoor" value={form.name} onChange={handle('name')} />
+                <InputField label="Full name" placeholder="Priya Kapoor" value={form.fullName}
+onChange={handle('fullName')} />
                 <InputField label="Username" placeholder="priya.creates" value={form.username} onChange={handle('username')} />
 
                 {/* Username preview */}
@@ -96,7 +124,13 @@ export default function Signup() {
               </button>
             )}
             <button
-              onClick={() => step === 1 ? setStep(2) : null}
+              onClick={() => {
+  if (step === 1) {
+    setStep(2)
+  } else {
+    handleSignup()
+  }
+}}
               style={{
                 flex:1, background:'#e8c97e', color:'#0a0a0a',
                 border:'none', borderRadius:'100px', padding:'0.9rem',

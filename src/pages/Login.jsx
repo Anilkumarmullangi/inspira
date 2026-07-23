@@ -1,12 +1,28 @@
-import { useState } from 'react'
+import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom'
 import InputField from '../components/InputField'
+import { login } from "../services/authService";
+
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' })
   const navigate = useNavigate()
   const handle = field => e => setForm({ ...form, [field]: e.target.value })
 
+  const handleLogin = async () => {
+  try {
+    const result = await login(form);
+
+    localStorage.setItem("token", result.token);
+    localStorage.setItem("user", JSON.stringify(result.user));
+
+    alert("Login Successful!");
+
+    navigate("/feed");
+  } catch (error) {
+    alert(error.response?.data?.message || "Something went wrong.");
+  }
+}
   return (
     <div style={{
       minHeight:'100vh', background:'#0a0a0a',
@@ -54,7 +70,7 @@ export default function Login() {
           </div>
 
           <button
-            onClick={() => navigate('/feed')}
+            onClick={handleLogin}
             style={{
               width:'100%', background:'#e8c97e', color:'#0a0a0a',
               border:'none', borderRadius:'100px', padding:'0.9rem',

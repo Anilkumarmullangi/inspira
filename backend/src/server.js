@@ -1,21 +1,20 @@
-import dotenv from "dotenv";
+import "./config/env.js";
+
 import app from "./app.js";
 import connectDB from "./config/db.js";
-
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
-    try {
-        await connectDB();
+  try {
+    await connectDB();
 
-        app.listen(PORT, () => {
-            console.log(`🚀 Inspira Server running on http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error(error);
-    }
+    app.listen(PORT, () => {
+      console.log(`🚀 Inspira Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 startServer();
