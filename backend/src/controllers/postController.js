@@ -1,6 +1,8 @@
 import streamifier from "streamifier";
 import cloudinary from "../config/cloudinary.js";
 import Post from "../models/Post.js";
+import fs from "fs";
+import path from "path";
 
 /* ===========================
    CREATE POST
@@ -11,7 +13,7 @@ export const createPost = async (req, res) => {
     console.log("BODY:", req.body);
     console.log("FILE:", req.file);
 
-    const { caption } = req.body;
+    const { caption = "", hashtags, location } = req.body;
 
     if (!req.file) {
       return res.status(400).json({
@@ -20,26 +22,65 @@ export const createPost = async (req, res) => {
       });
     }
 
-    // Upload image to Cloudinary
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: "inspira/posts",
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
+    // Upload image to Cloudinary using buffer stream, fallback to local storage on failure
+    let imageUrl;
+    try {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "inspira/posts",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
 
-      streamifier.createReadStream(req.file.buffer).pipe(stream);
-    });
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+
+      imageUrl = result.secure_url;
+    } catch (err) {
+      console.warn('Cloudinary upload failed, falling back to local storage:', err && err.message ? err.message : err);
+
+      // Save file locally to uploads/ so frontend can continue working without Cloudinary
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      await fs.promises.mkdir(uploadsDir, { recursive: true });
+      const ext = (req.file.originalname && req.file.originalname.includes('.'))
+        ? req.file.originalname.split('.').pop()
+        : (req.file.mimetype === 'image/png' ? 'png' : 'jpg');
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const filePath = path.join(uploadsDir, filename);
+      await fs.promises.writeFile(filePath, req.file.buffer);
+      imageUrl = `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+    }
+
+    // Normalize hashtags: accept comma-separated string, array, or parse from caption
+    let hashtagsArray = [];
+    if (hashtags) {
+      if (Array.isArray(hashtags)) {
+        hashtagsArray = hashtags.map((h) => String(h).trim()).filter(Boolean);
+      } else if (typeof hashtags === "string") {
+        hashtagsArray = hashtags
+          .split(",")
+          .map((h) => h.trim())
+          .filter(Boolean);
+      }
+    } else {
+      // simple regex to extract #tags from caption
+      const tagMatches = caption.match(/#(\w+)/g);
+      if (tagMatches) {
+        hashtagsArray = tagMatches.map((t) => t.replace(/^#/, ""));
+      }
+    }
 
     // Save post in MongoDB
     const post = await Post.create({
       author: req.userId,
       caption,
-      image: result.secure_url,
+      hashtags: hashtagsArray,
+      location: location || "",
+      image: imageUrl,
     });
 
     // Populate author details
@@ -53,7 +94,15 @@ export const createPost = async (req, res) => {
       post: populatedPost,
     });
   } catch (error) {
-    console.error(error);
+    console.error('createPost error:', error);
+
+    if (error && error.http_code) {
+      return res.status(error.http_code === 403 ? 502 : error.http_code).json({
+        success: false,
+        message: `Cloudinary error: ${error.message}`,
+        cloudinary_http_code: error.http_code,
+      });
+    }
 
     return res.status(500).json({
       success: false,
