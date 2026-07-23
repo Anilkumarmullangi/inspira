@@ -1,5 +1,18 @@
-PORT=5000
+# Node dependencies
+node_modules/
 
-MONGODB_URI=mongodb://127.0.0.1:27017/inspira
+# Environment files (do NOT commit secrets)
+.env
+.env.local
 
-JWT_SECRET=inspira_super_secret_key_change_this
+# Build output
+dist/
+
+# Logs
+logs/
+*.log
+
+# OS and editor files
+.DS_Store
+.vscode/
+.idea/
