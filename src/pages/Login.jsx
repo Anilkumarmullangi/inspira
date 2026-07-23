@@ -19,9 +19,12 @@ export default function Login() {
     alert("Login Successful!");
 
     navigate("/feed");
-  } catch (error) {
-    alert(error.response?.data?.message || "Something went wrong.");
-  }
+  } catch (err) {
+  console.log(err);
+  console.log(err.response?.data);
+
+  alert(err.response?.data?.message || err.message);
+}
 }
   return (
     <div style={{

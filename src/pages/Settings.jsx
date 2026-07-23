@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import API from '../api/axios'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
+import { useAuth } from '../context/AuthContext'
 
 const settingsSections = [
   { id:'account', label:'Account', icon:'👤' },
@@ -16,20 +18,130 @@ const settingsSections = [
 ]
 
 export default function Settings() {
+  const { user: authUser, setUser: setAuthUser } = useAuth();
   const [activeSection, setActiveSection] = useState('account')
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const [user, setUser] = useState(null)
+
+
+    const [selectedImage, setSelectedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+
+const [formData, setFormData] = useState({
+  fullName: "",
+  username: "",
+  bio: "",
+  website: "",
+  email: "",
+})
   const navigate = useNavigate()
+  
+  const fetchUser = async () => {
+  try {
+    console.log("Fetching user data...");
+    const res = await API.get("/users/me");
+    console.log("User data response:", res.data);
 
-  const saveSettings = () => {
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    if (res.data.success) {
+      const u = res.data.user;
+
+      setUser(u);
+      setAuthUser(u);
+      setPreviewImage(u.profilePic || "");
+      setFormData({
+        fullName: u.fullName || "",
+        username: u.username || "",
+        bio: u.bio || "",
+        website: u.website || "",
+        email: u.email || "",
+      });
+    }
+  } catch (err) {
+    console.error("Failed to fetch user:", err);
+    console.error("Error response:", err.response);
+    console.error("Error message:", err.message);
+    setError(err.response?.data?.message || err.message || "Failed to load user data");
   }
+};
+  const saveSettings = async () => {
+  setError('');
+  try {
+    const res = await API.put("/users/update", formData);
 
-  return (
-    <div style={{
-      display:'flex', minHeight:'100vh',
-      background:'#0a0a0a', fontFamily:"'Outfit',sans-serif",
-    }}>
+    if (res.data.success) {
+      setSaved(true);
+      setAuthUser(res.data.user);
+      setUser(res.data.user);
+
+      setTimeout(() => {
+        setSaved(false);
+      }, 2000);
+    }
+  } catch (err) {
+    console.error("Failed to save settings:", err);
+    setError(err.response?.data?.message || "Failed to save settings");
+  }
+};
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  setSelectedImage(file);
+  setPreviewImage(URL.createObjectURL(file));
+};
+
+const uploadProfilePicture = async () => {
+  if (!selectedImage) return;
+
+  setError('');
+  try {
+    setUploadingImage(true);
+
+    const form = new FormData();
+    form.append("profilePic", selectedImage);
+
+    const res = await API.put(
+      "/users/profile-picture",
+      form,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (res.data.success) {
+      await fetchUser();
+      setSelectedImage(null);
+    }
+  } catch (err) {
+    console.error("Failed to upload profile picture:", err);
+    setError(err.response?.data?.message || "Failed to upload profile picture");
+  } finally {
+    setUploadingImage(false);
+  }
+};
+
+useEffect(() => {
+  if (authUser) {
+    fetchUser();
+  }
+}, [authUser]);
+
+return (
+  <div
+    style={{
+      display: "flex",
+      minHeight: "100vh",
+      background: "#0a0a0a",
+      fontFamily: "'Outfit',sans-serif",
+    }}
+  >
+      
       <Sidebar />
 
       {/* Settings sidebar */}
@@ -96,12 +208,98 @@ export default function Settings() {
           {/* ACCOUNT */}
           {activeSection === 'account' && (
             <SettingsSection title="Account" subtitle="Manage your profile and account details">
+              {error && (
+                <div style={{
+                  background: 'rgba(201,111,111,0.1)',
+                  border: '1px solid rgba(201,111,111,0.3)',
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  marginBottom: '1.5rem',
+                  color: '#c96f6f',
+                  fontSize: '0.85rem',
+                }}>
+                  {error}
+                </div>
+              )}
+              <SettingsGroup title="Profile Picture">
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "20px",
+    }}
+  >
+    <img
+      src={previewImage || "https://placehold.co/120x120"}
+      alt="Profile"
+      style={{
+        width: "110px",
+        height: "110px",
+        borderRadius: "50%",
+        objectFit: "cover",
+        border: "3px solid #2a2a2a",
+      }}
+    />
+
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+      />
+
+      <button
+        onClick={uploadProfilePicture}
+        disabled={uploadingImage}
+        style={{
+          background: "#e8c97e",
+          color: "#111",
+          border: "none",
+          borderRadius: "8px",
+          padding: "10px 18px",
+          cursor: uploadingImage ? "not-allowed" : "pointer",
+          opacity: uploadingImage ? 0.7 : 1,
+        }}
+      >
+        {uploadingImage ? "Uploading..." : "Upload Picture"}
+      </button>
+    </div>
+  </div>
+</SettingsGroup>
               <SettingsGroup title="Profile">
-                <SettingsInput label="Full name" defaultValue="Your Name" />
-                <SettingsInput label="Username" defaultValue="your.handle" prefix="@" />
-                <SettingsInput label="Bio" defaultValue="Visual storyteller based in Hyderabad 🇮🇳" multiline />
-                <SettingsInput label="Website" defaultValue="inspira.app/@your.handle" />
-                <SettingsInput label="Email" defaultValue="you@example.com" type="email" />
+                <SettingsInput
+label="Full name"
+value={formData.fullName}
+onChange={(e)=>
+setFormData({
+...formData,
+fullName:e.target.value
+})}
+/>
+                <SettingsInput label="Username" value={formData.username}
+onChange={(e)=>
+setFormData({
+...formData,
+username:e.target.value
+})} prefix="@" />
+                <SettingsInput label="Bio" value={formData.bio}
+onChange={(e)=>
+setFormData({
+...formData,
+bio:e.target.value
+})} multiline />
+                <SettingsInput label="Website" value={formData.website}
+onChange={(e)=>
+setFormData({
+...formData,
+website:e.target.value
+})} />
+                <SettingsInput label="Email" value={formData.email}
+onChange={(e)=>
+setFormData({
+...formData,
+email:e.target.value
+})} type="email" />
               </SettingsGroup>
 
               <SettingsGroup title="Account type">
@@ -667,7 +865,16 @@ function SettingsGroup({ title, children }) {
   )
 }
 
-function SettingsInput({ label, defaultValue, type='text', placeholder, multiline, prefix }) {
+function SettingsInput({
+  label,
+  value,
+  onChange,
+  defaultValue,
+  type = "text",
+  placeholder,
+  multiline,
+  prefix,
+}) {
   return (
     <div style={{ marginBottom:'0.85rem' }}>
       <label style={{
@@ -682,33 +889,50 @@ function SettingsInput({ label, defaultValue, type='text', placeholder, multilin
         )}
         {multiline ? (
           <textarea
-            defaultValue={defaultValue}
-            rows={3}
-            style={{
-              width:'100%', background:'#111', border:'1px solid #2a2a2a',
-              borderRadius:'10px', padding:'0.65rem 0.85rem',
-              color:'#f0ede8', fontSize:'0.85rem',
-              fontFamily:"'Outfit',sans-serif", outline:'none',
-              resize:'vertical', lineHeight:1.6, boxSizing:'border-box',
-            }}
-            onFocus={e => e.target.style.borderColor='#e8c97e'}
-            onBlur={e => e.target.style.borderColor='#2a2a2a'}
-          />
+  value={value}
+  onChange={onChange}
+  rows={3}
+  style={{
+    width: "100%",
+    background: "#111",
+    border: "1px solid #2a2a2a",
+    borderRadius: "10px",
+    padding: "0.65rem 0.85rem",
+    color: "#f0ede8",
+    fontSize: "0.85rem",
+    fontFamily: "'Outfit',sans-serif",
+    outline: "none",
+    resize: "vertical",
+    lineHeight: 1.6,
+    boxSizing: "border-box",
+  }}
+  onFocus={(e) => (e.target.style.borderColor = "#e8c97e")}
+  onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
+/>
         ) : (
           <input
-            type={type}
-            defaultValue={defaultValue}
-            placeholder={placeholder}
-            style={{
-              width:'100%', background:'#111', border:'1px solid #2a2a2a',
-              borderRadius:'10px', padding: prefix ? '0.65rem 0.85rem 0.65rem 1.75rem' : '0.65rem 0.85rem',
-              color:'#f0ede8', fontSize:'0.85rem',
-              fontFamily:"'Outfit',sans-serif", outline:'none',
-              boxSizing:'border-box', transition:'border-color 0.2s',
-            }}
-            onFocus={e => e.target.style.borderColor='#e8c97e'}
-            onBlur={e => e.target.style.borderColor='#2a2a2a'}
-          />
+  type={type}
+  value={value}
+  onChange={onChange}
+  placeholder={placeholder}
+  style={{
+    width: "100%",
+    background: "#111",
+    border: "1px solid #2a2a2a",
+    borderRadius: "10px",
+    padding: prefix
+      ? "0.65rem 0.85rem 0.65rem 1.75rem"
+      : "0.65rem 0.85rem",
+    color: "#f0ede8",
+    fontSize: "0.85rem",
+    fontFamily: "'Outfit',sans-serif",
+    outline: "none",
+    boxSizing: "border-box",
+    transition: "border-color .2s",
+  }}
+  onFocus={(e) => (e.target.style.borderColor = "#e8c97e")}
+  onBlur={(e) => (e.target.style.borderColor = "#2a2a2a")}
+/>
         )}
       </div>
     </div>

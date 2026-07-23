@@ -1,363 +1,735 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
-import { profileData, profilePosts } from '../constants/data'
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import API from "../api/axios";
 
 export default function Profile() {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('posts')
-  const [hoveredPost, setHoveredPost] = useState(null)
-  const isMobile = window.innerWidth <= 768
+  const navigate = useNavigate();
+
+  /* ===========================
+      STATES
+  =========================== */
+
+  const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [activeTab, setActiveTab] = useState("posts");
+  const [hoveredPost, setHoveredPost] = useState(null);
+
+  const isMobile = window.innerWidth <= 768;
+
+  /* ===========================
+      FETCH PROFILE
+  =========================== */
+
+  const fetchProfile = async () => {
+    try {
+      const res = await API.get("/users/me");
+
+      if (res.data.success) {
+        setUser(res.data.user);
+      }
+    } catch (err) {
+      console.error(err);
+
+      setError("Unable to load profile.");
+    }
+  };
+
+  /* ===========================
+      FETCH MY POSTS
+  =========================== */
+
+  const fetchPosts = async () => {
+    try {
+      const res = await API.get("/posts/me");
+
+      if (res.data.success) {
+        setPosts(res.data.posts);
+      }
+    } catch (err) {
+      console.error(err);
+
+      setError("Unable to load posts.");
+    }
+  };
+
+  /* ===========================
+      LOAD PAGE
+  =========================== */
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+
+      await Promise.all([
+        fetchProfile(),
+        fetchPosts(),
+      ]);
+
+      setLoading(false);
+    };
+
+    loadData();
+  }, []);
+
+  /* ===========================
+      TABS
+  =========================== */
 
   const tabs = [
-    { id:'posts', label:'Posts', count: profileData.posts },
-    { id:'saved', label:'Saved', count: 23 },
-    { id:'tagged', label:'Tagged', count: 14 },
-    { id:'analytics', label:'Analytics ✦', count: null },
-  ]
+    {
+      id: "posts",
+      label: "Posts",
+      count: posts.length,
+    },
+    {
+      id: "saved",
+      label: "Saved",
+      count: 0,
+    },
+    {
+      id: "tagged",
+      label: "Tagged",
+      count: 0,
+    },
+    {
+      id: "analytics",
+      label: "Analytics ✦",
+      count: null,
+    },
+  ];
+
+  /* ===========================
+      LOADING
+  =========================== */
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0a0a0a",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "#fff",
+          fontSize: "22px",
+        }}
+      >
+        Loading Profile...
+      </div>
+    );
+  }
+
+  /* ===========================
+      ERROR
+  =========================== */
+
+  if (error) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0a0a0a",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: "#ff5c5c",
+          fontSize: "20px",
+        }}
+      >
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div style={{
-      display:'flex', minHeight:'100vh',
-      background:'#0a0a0a', fontFamily:"'Outfit',sans-serif",
-    }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#0a0a0a",
+        fontFamily: "'Outfit', sans-serif",
+      }}
+    >
       <Sidebar />
 
-      <main style={{ flex:1, overflowY:'auto' }}>
+      <main
+        style={{
+          flex: 1,
+          overflowY: "auto",
+        }}
+      >
 
-        {/* Cover */}
-        <div style={{
-          height:'140px',
-          background:'linear-gradient(135deg,#1a1208,#0f0f1a,#0a1520)',
-          position:'relative',
-        }}>
-          <button style={{
-            position:'absolute', top:'1rem', right:'1rem',
-            background:'rgba(10,10,10,0.6)', border:'1px solid #2a2a2a',
-            borderRadius:'8px', padding:'0.4rem 0.85rem',
-            color:'#888', fontSize:'0.75rem', cursor:'pointer',
-            fontFamily:"'Outfit',sans-serif", backdropFilter:'blur(8px)',
-          }}>Edit cover</button>
+                {/* ===========================
+              COVER
+        =========================== */}
+
+        <div
+          style={{
+            height: "140px",
+            background:
+              "linear-gradient(135deg,#1a1208,#0f0f1a,#0a1520)",
+            position: "relative",
+          }}
+        >
+          <button
+            style={{
+              position: "absolute",
+              top: "1rem",
+              right: "1rem",
+              background: "rgba(10,10,10,0.6)",
+              border: "1px solid #2a2a2a",
+              borderRadius: "8px",
+              padding: "0.45rem 0.9rem",
+              color: "#888",
+              cursor: "pointer",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            Edit Cover
+          </button>
         </div>
 
-        <div style={{ padding:'0 3vw', maxWidth:'1000px', margin:'0 auto' }}>
+        <div
+          style={{
+            padding: "0 3vw",
+            maxWidth: "1000px",
+            margin: "0 auto",
+          }}
+        >
+          {/* ===========================
+                PROFILE HEADER
+          =========================== */}
 
-          {/* Profile info row */}
-          <div style={{
-            display:'flex', alignItems:'flex-end',
-            justifyContent:'space-between',
-            marginTop:'-1px', marginBottom:'1.5rem',
-          }}>
-            <div style={{ display:'flex', alignItems:'flex-end', gap:'1.25rem' }}>
-              <div style={{
-                width:'100px', height:'100px', borderRadius:'50%',
-                background: profileData.gradient,
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:'1.5rem', fontWeight:700, color:'#0a0a0a',
-                border:'4px solid #0a0a0a', flexShrink:0,
-              }}>{profileData.avatar}</div>
-              <div style={{ paddingBottom:'0.5rem' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
-                  <h1 style={{
-                    fontFamily:"'Cormorant Garamond',serif",
-                    fontSize:'1.6rem', fontWeight:600, color:'#f0ede8', margin:0,
-                  }}>{profileData.name}</h1>
-                  {profileData.verified && (
-                    <span style={{
-                      background:'#e8c97e', color:'#0a0a0a',
-                      borderRadius:'50%', width:'18px', height:'18px',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      fontSize:'0.6rem', fontWeight:700, flexShrink:0,
-                    }}>✓</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              marginTop: "-45px",
+              marginBottom: "2rem",
+              flexWrap: "wrap",
+              gap: "20px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                gap: "20px",
+              }}
+            >
+              {/* Avatar */}
+
+              <div
+                style={{
+                  width: "110px",
+                  height: "110px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: "4px solid #0a0a0a",
+                  background:
+                    "linear-gradient(135deg,#e8c97e,#d8b15a)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  color: "#111",
+                  flexShrink: 0,
+                }}
+              >
+                {user?.profilePic ? (
+                  <img
+                    src={user.profilePic}
+                    alt="Profile"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  user?.fullName?.charAt(0).toUpperCase()
+                )}
+              </div>
+
+              {/* Name */}
+
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <h1
+                    style={{
+                      margin: 0,
+                      color: "#f0ede8",
+                      fontSize: "32px",
+                      fontFamily:
+                        "'Cormorant Garamond', serif",
+                    }}
+                  >
+                    {user?.fullName}
+                  </h1>
+
+                  {user?.isVerified && (
+                    <span
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        background: "#e8c97e",
+                        color: "#111",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      ✓
+                    </span>
                   )}
                 </div>
-                <div style={{ fontSize:'0.82rem', color:'#555', marginTop:'2px' }}>
-                  @{profileData.username}
+
+                <div
+                  style={{
+                    color: "#777",
+                    marginTop: "5px",
+                  }}
+                >
+                  @{user?.username}
                 </div>
               </div>
             </div>
 
-            <div style={{ display:'flex', gap:'0.75rem', paddingBottom:'0.5rem' }}>
-              <button
-                onClick={() => navigate('/settings')}
-                style={{
-                  background:'transparent', border:'1px solid #2a2a2a',
-                  borderRadius:'100px', padding:'0.5rem 1.25rem',
-                  color:'#888', fontSize:'0.82rem', cursor:'pointer',
-                  fontFamily:"'Outfit',sans-serif", transition:'all 0.2s',
-                }}
-                onMouseEnter={e => { e.target.style.borderColor='#555'; e.target.style.color='#f0ede8' }}
-                onMouseLeave={e => { e.target.style.borderColor='#2a2a2a'; e.target.style.color='#888' }}
-              >Edit profile</button>
-              <button style={{
-                background:'transparent', border:'1px solid #2a2a2a',
-                borderRadius:'100px', padding:'0.5rem 1.25rem',
-                color:'#888', fontSize:'0.82rem', cursor:'pointer',
-                fontFamily:"'Outfit',sans-serif", transition:'all 0.2s',
+            {/* Buttons */}
+
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
               }}
-                onMouseEnter={e => { e.target.style.borderColor='#555'; e.target.style.color='#f0ede8' }}
-                onMouseLeave={e => { e.target.style.borderColor='#2a2a2a'; e.target.style.color='#888' }}
-              >Share profile</button>
+            >
+              <button
+                onClick={() => navigate("/settings")}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #333",
+                  color: "#fff",
+                  padding: "10px 20px",
+                  borderRadius: "30px",
+                  cursor: "pointer",
+                }}
+              >
+                Edit Profile
+              </button>
+
+              <button
+                style={{
+                  background: "transparent",
+                  border: "1px solid #333",
+                  color: "#fff",
+                  padding: "10px 20px",
+                  borderRadius: "30px",
+                  cursor: "pointer",
+                }}
+              >
+                Share Profile
+              </button>
             </div>
           </div>
 
-          {/* Bio */}
-          <div style={{ marginBottom:'1.5rem' }}>
-            <p style={{ fontSize:'0.9rem', color:'#888', lineHeight:1.7, marginBottom:'0.4rem' }}>
-              {profileData.bio}
+          {/* ===========================
+                BIO
+          =========================== */}
+
+          <div
+            style={{
+              marginBottom: "30px",
+            }}
+          >
+            <p
+              style={{
+                color: "#aaa",
+                lineHeight: 1.7,
+                marginBottom: "10px",
+              }}
+            >
+              {user?.bio || "No bio added yet."}
             </p>
-            <a href="#" style={{ fontSize:'0.85rem', color:'#e8c97e', textDecoration:'none' }}>
-              🔗 {profileData.website}
-            </a>
+
+            {user?.website && (
+              <a
+                href={user.website}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  color: "#e8c97e",
+                  textDecoration: "none",
+                }}
+              >
+                🔗 {user.website}
+              </a>
+            )}
           </div>
 
-          {/* Stats */}
-          <div style={{
-            display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
-            gap:'1px', background:'#2a2a2a', borderRadius:'14px',
-            overflow:'hidden', marginBottom:'2rem', border:'1px solid #2a2a2a',
-          }}>
+          {/* ===========================
+                STATS
+          =========================== */}
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile
+                ? "repeat(2,1fr)"
+                : "repeat(4,1fr)",
+              gap: "1px",
+              background: "#2a2a2a",
+              borderRadius: "14px",
+              overflow: "hidden",
+              marginBottom: "2rem",
+              border: "1px solid #2a2a2a",
+            }}
+          >
             {[
-              { label:'Posts', value: profileData.posts },
-              { label:'Followers', value:'12.4k' },
-              { label:'Following', value: profileData.following },
-              { label:'Total reach ✦', value:'248k', inspira:true },
-            ].map(stat => (
-              <div key={stat.label} style={{
-                background:'#111', padding:'1.1rem',
-                textAlign:'center', cursor:'pointer', transition:'background 0.2s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.background='#1a1a1a'}
-                onMouseLeave={e => e.currentTarget.style.background='#111'}
+              {
+                label: "Posts",
+                value: posts.length,
+              },
+              {
+                label: "Followers",
+                value: user?.followers?.length || 0,
+              },
+              {
+                label: "Following",
+                value: user?.following?.length || 0,
+              },
+              {
+                label: "Email",
+                value: user?.email || "-",
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                style={{
+                  background: "#111",
+                  padding: "20px",
+                  textAlign: "center",
+                }}
               >
-                <div style={{
-                  fontFamily:"'Cormorant Garamond',serif",
-                  fontSize:'1.5rem', fontWeight:600,
-                  color: stat.inspira ? '#e8c97e' : '#f0ede8', lineHeight:1,
-                }}>{stat.value}</div>
-                <div style={{
-                  fontSize:'0.7rem', color: stat.inspira ? '#e8c97e' : '#555',
-                  marginTop:'0.35rem', fontWeight: stat.inspira ? 500 : 400,
-                }}>{stat.label}</div>
+                <div
+                  style={{
+                    fontSize: "28px",
+                    color: "#fff",
+                    fontFamily:
+                      "'Cormorant Garamond', serif",
+                  }}
+                >
+                  {stat.value}
+                </div>
+
+                <div
+                  style={{
+                    color: "#777",
+                    marginTop: "6px",
+                    fontSize: "13px",
+                  }}
+                >
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Highlights */}
-          <div style={{ marginBottom:'2rem' }}>
-            <div style={{ display:'flex', gap:'1.25rem', overflowX:'auto', paddingBottom:'0.5rem' }}>
-              {['Travel','Food','Architecture','Nature','Add'].map(hl => (
-                <div key={hl} style={{
-                  display:'flex', flexDirection:'column',
-                  alignItems:'center', gap:'0.5rem', flexShrink:0, cursor:'pointer',
-                }}>
-                  <div style={{
-                    width:'64px', height:'64px', borderRadius:'50%',
-                    border: hl === 'Add' ? '2px dashed #2a2a2a' : '2px solid #2a2a2a',
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    fontSize:'1.5rem', background: hl === 'Add' ? 'transparent' : '#111',
-                    transition:'border-color 0.2s',
-                  }}
-                    onMouseEnter={e => e.currentTarget.style.borderColor='#e8c97e'}
-                    onMouseLeave={e => e.currentTarget.style.borderColor='#2a2a2a'}
-                  >
-                    {hl === 'Travel' ? '✈️' : hl === 'Food' ? '☕' : hl === 'Architecture' ? '🏛' : hl === 'Nature' ? '🌿' : '+'}
-                  </div>
-                  <span style={{ fontSize:'0.68rem', color:'#555' }}>{hl}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* ===========================
+                PROFILE TABS
+          =========================== */}
 
-          {/* Tabs */}
-          <div style={{
-            display:'flex', borderBottom:'1px solid #2a2a2a',
-            marginBottom:'1.5rem',
-          }}>
-            {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-                background:'transparent', border:'none',
-                borderBottom: activeTab === tab.id ? '2px solid #e8c97e' : '2px solid transparent',
-                padding:'0.75rem 1.5rem', cursor:'pointer',
-                color: activeTab === tab.id ? '#f0ede8' : '#555',
-                fontSize:'0.82rem', fontWeight: activeTab === tab.id ? 500 : 400,
-                fontFamily:"'Outfit',sans-serif", transition:'all 0.2s',
-                marginBottom:'-1px',
-              }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              marginBottom: "2rem",
+              borderBottom: "1px solid #222",
+              overflowX: "auto",
+              paddingBottom: "12px",
+            }}
+          >
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: "30px",
+                  border:
+                    activeTab === tab.id
+                      ? "1px solid #e8c97e"
+                      : "1px solid #2a2a2a",
+                  background:
+                    activeTab === tab.id
+                      ? "#e8c97e"
+                      : "transparent",
+                  color:
+                    activeTab === tab.id
+                      ? "#111"
+                      : "#aaa",
+                  cursor: "pointer",
+                  transition: "0.3s",
+                  whiteSpace: "nowrap",
+                  fontWeight: 600,
+                }}
+              >
                 {tab.label}
-                {tab.count !== null && (
-                  <span style={{ marginLeft:'0.4rem', color:'#555', fontSize:'0.72rem' }}>
-                    {tab.count}
-                  </span>
-                )}
+                {tab.count !== null && ` (${tab.count})`}
               </button>
             ))}
           </div>
 
-          {/* POSTS TAB */}
-          {activeTab === 'posts' && (
-            <div style={{
-             display:'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)',
-              gap:'3px', borderRadius:'8px', overflow:'hidden',
-              marginBottom:'3rem',
-            }}>
-              {profilePosts.map(post => (
+          {/* ===========================
+                POSTS TAB
+          =========================== */}
+
+          {activeTab === "posts" && (
+            <>
+              {posts.length === 0 ? (
                 <div
-                  key={post.id}
-                  onClick={() => navigate(`/post/${post.id}`)}
-                  onMouseEnter={() => setHoveredPost(post.id)}
-                  onMouseLeave={() => setHoveredPost(null)}
                   style={{
-                    aspectRatio:'1', background: post.bg,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    fontSize:'2.5rem', cursor:'pointer', position:'relative',
-                    transition:'transform 0.2s',
-                    transform: hoveredPost === post.id ? 'scale(0.98)' : 'scale(1)',
+                    textAlign: "center",
+                    padding: "80px 0",
+                    color: "#666",
                   }}
                 >
-                  {post.emoji}
-                  {hoveredPost === post.id && (
-                    <div style={{
-                      position:'absolute', inset:0,
-                      background:'rgba(10,10,10,0.7)',
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      gap:'1.5rem',
-                    }}>
-                      <span style={{ color:'white', fontSize:'0.85rem', fontWeight:600 }}>
-                        ♥ {post.likes.toLocaleString()}
-                      </span>
-                      <span style={{ color:'white', fontSize:'0.85rem', fontWeight:600 }}>
-                        💬 {post.comments}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* SAVED TAB */}
-          {activeTab === 'saved' && (
-            <div style={{ textAlign:'center', padding:'4rem 0', color:'#555' }}>
-              <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🔖</div>
-              <p style={{ fontSize:'0.9rem' }}>Only you can see your saved posts</p>
-              <p style={{ fontSize:'0.78rem', marginTop:'0.5rem', color:'#444' }}>
-                ✦ Inspira keeps your saves completely private — Instagram doesn't always.
-              </p>
-              <button
-                onClick={() => navigate('/collections')}
-                style={{
-                  background:'transparent', border:'1px solid #2a2a2a',
-                  borderRadius:'100px', padding:'0.5rem 1.25rem',
-                  color:'#e8c97e', fontSize:'0.82rem', cursor:'pointer',
-                  fontFamily:"'Outfit',sans-serif", marginTop:'1rem',
-                }}
-              >View Collections →</button>
-            </div>
-          )}
-
-          {/* ANALYTICS TAB */}
-          {activeTab === 'analytics' && (
-            <div style={{ marginBottom:'3rem' }}>
-              <button
-                onClick={() => navigate('/analytics')}
-                style={{
-                  background:'#e8c97e', color:'#0a0a0a', border:'none',
-                  borderRadius:'100px', padding:'0.6rem 1.5rem',
-                  fontSize:'0.82rem', fontWeight:600, cursor:'pointer',
-                  fontFamily:"'Outfit',sans-serif", marginBottom:'1.25rem',
-                  display:'block',
-                }}
-              >View full analytics dashboard →</button>
-
-              <div style={{
-                background:'rgba(232,201,126,0.05)',
-                border:'1px solid rgba(232,201,126,0.1)',
-                borderRadius:'14px', padding:'1.25rem', marginBottom:'1.5rem',
-              }}>
-                <div style={{ fontSize:'0.72rem', color:'#e8c97e', fontWeight:500, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'0.5rem' }}>
-                  ✦ Free for all creators — unlike Instagram
-                </div>
-                <p style={{ fontSize:'0.82rem', color:'#666', lineHeight:1.6, margin:0 }}>
-                  Instagram locks deep analytics behind business accounts. On Inspira, every creator gets full analytics for free.
-                </p>
-              </div>
-
-              <div style={{
-                display:'grid', gridTemplateColumns:'repeat(2,1fr)',
-                gap:'1rem', marginBottom:'1.5rem',
-              }}>
-                {[
-                  { label:'Total impressions', value:'248,391', change:'+12%', up:true },
-                  { label:'Profile visits', value:'18,204', change:'+8%', up:true },
-                  { label:'Avg. reach per post', value:'5,174', change:'-3%', up:false },
-                  { label:'Saves rate', value:'4.2%', change:'+1.1%', up:true },
-                ].map(stat => (
-                  <div key={stat.label} style={{
-                    background:'#111', border:'1px solid #2a2a2a',
-                    borderRadius:'14px', padding:'1.25rem',
-                  }}>
-                    <div style={{ fontSize:'0.72rem', color:'#555', marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.06em' }}>
-                      {stat.label}
-                    </div>
-                    <div style={{
-                      fontFamily:"'Cormorant Garamond',serif",
-                      fontSize:'1.8rem', fontWeight:600, color:'#f0ede8',
-                      lineHeight:1, marginBottom:'0.35rem',
-                    }}>{stat.value}</div>
-                    <div style={{ fontSize:'0.75rem', color: stat.up ? '#6fcf97' : '#c96f6f', fontWeight:500 }}>
-                      {stat.change} this month
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{
-                background:'#111', border:'1px solid #2a2a2a',
-                borderRadius:'14px', padding:'1.25rem',
-              }}>
-                <div style={{ fontSize:'0.72rem', color:'#888', fontWeight:500, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'1rem' }}>
-                  Top performing posts
-                </div>
-                {profilePosts.slice(0,4).map((post, i) => (
-                  <div
-                    key={post.id}
-                    onClick={() => navigate(`/post/${post.id}`)}
+                  <h2
                     style={{
-                      display:'flex', alignItems:'center', gap:'0.75rem',
-                      padding:'0.65rem 0', cursor:'pointer',
-                      borderBottom: i < 3 ? '1px solid #1a1a1a' : 'none',
+                      color: "#ddd",
+                      marginBottom: "10px",
                     }}
                   >
-                    <div style={{
-                      width:'40px', height:'40px', borderRadius:'8px',
-                      background: post.bg, display:'flex', alignItems:'center',
-                      justifyContent:'center', fontSize:'1.2rem', flexShrink:0,
-                    }}>{post.emoji}</div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ fontSize:'0.78rem', color:'#888' }}>
-                        ♥ {post.likes.toLocaleString()} · 💬 {post.comments}
+                    No Posts Yet
+                  </h2>
+
+                  <p>
+                    Share your first moment on Inspira ✨
+                  </p>
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill,minmax(260px,1fr))",
+                    gap: "22px",
+                    marginBottom: "50px",
+                  }}
+                >
+                  {posts.map((post) => (
+                    <div
+                      key={post._id}
+                      onMouseEnter={() =>
+                        setHoveredPost(post._id)
+                      }
+                      onMouseLeave={() =>
+                        setHoveredPost(null)
+                      }
+                      style={{
+                        background: "#111",
+                        border: "1px solid #222",
+                        borderRadius: "18px",
+                        overflow: "hidden",
+                        transition: ".35s",
+                        transform:
+                          hoveredPost === post._id
+                            ? "translateY(-6px)"
+                            : "translateY(0)",
+                        boxShadow:
+                          hoveredPost === post._id
+                            ? "0 12px 30px rgba(0,0,0,.45)"
+                            : "none",
+                      }}
+                    >
+                      <div
+                        style={{
+                          height: "270px",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <img
+                          src={post.image}
+                          alt=""
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          padding: "16px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            color: "#ddd",
+                            marginBottom: "14px",
+                            lineHeight: 1.6,
+                          }}
+                        >
+                          {post.caption}
+                        </p>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent:
+                              "space-between",
+                            color: "#888",
+                            fontSize: "14px",
+                          }}
+                        >
+                          <span>
+                            ❤️ {post.likes?.length || 0}
+                          </span>
+
+                          <span>
+                            💬 {post.comments?.length || 0}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div style={{ fontSize:'0.72rem', color:'#e8c97e', fontWeight:500 }}>
-                      #{i + 1} top
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ===========================
+                SAVED
+          =========================== */}
+
+          {activeTab === "saved" && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "90px 0",
+                color: "#666",
+              }}
+            >
+              <h2 style={{ color: "#ddd" }}>
+                Saved Posts
+              </h2>
+
+              <p>No saved posts available.</p>
             </div>
           )}
 
-          {/* TAGGED TAB */}
-          {activeTab === 'tagged' && (
-            <div style={{ textAlign:'center', padding:'4rem 0', color:'#555' }}>
-              <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>🏷</div>
-              <p style={{ fontSize:'0.9rem' }}>Posts you've been tagged in</p>
+          {/* ===========================
+                TAGGED
+          =========================== */}
+
+          {activeTab === "tagged" && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "90px 0",
+                color: "#666",
+              }}
+            >
+              <h2 style={{ color: "#ddd" }}>
+                Tagged Posts
+              </h2>
+
+              <p>No tagged posts found.</p>
+            </div>
+          )}
+
+          {/* ===========================
+                ANALYTICS
+          =========================== */}
+
+          {activeTab === "analytics" && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit,minmax(230px,1fr))",
+                gap: "20px",
+                marginBottom: "50px",
+              }}
+            >
+              {[
+                {
+                  title: "Total Posts",
+                  value: posts.length,
+                },
+                {
+                  title: "Total Likes",
+                  value: posts.reduce(
+                    (a, p) =>
+                      a + (p.likes?.length || 0),
+                    0
+                  ),
+                },
+                {
+                  title: "Comments",
+                  value: posts.reduce(
+                    (a, p) =>
+                      a + (p.comments?.length || 0),
+                    0
+                  ),
+                },
+                {
+                  title: "Followers",
+                  value:
+                    user?.followers?.length || 0,
+                },
+              ].map((card) => (
+                <div
+                  key={card.title}
+                  style={{
+                    background: "#111",
+                    border: "1px solid #222",
+                    borderRadius: "18px",
+                    padding: "28px",
+                  }}
+                >
+                  <div
+                    style={{
+                      color: "#888",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    {card.title}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: "34px",
+                      color: "#fff",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {card.value}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
         </div>
       </main>
     </div>
-  )
+  );
 }

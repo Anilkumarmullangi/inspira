@@ -7,11 +7,17 @@ import {
   getAllPosts,
   deletePost,
   toggleLike,
+  getMyPosts,
+  addComment,
+  deleteComment,
+  getPostById,
 } from "../controllers/postController.js";
 
 const router = express.Router();
 
 router.get("/", authMiddleware, getAllPosts);
+router.get("/me", authMiddleware, getMyPosts);
+router.get("/:id", authMiddleware, getPostById);
 
 router.post(
   "/create",
@@ -21,6 +27,9 @@ router.post(
 );
 
 router.put("/:id/like", authMiddleware, toggleLike);
+
+router.post("/:id/comments", authMiddleware, addComment);
+router.delete("/:postId/comments/:commentId", authMiddleware, deleteComment);
 
 router.delete("/:id", authMiddleware, deletePost);
 

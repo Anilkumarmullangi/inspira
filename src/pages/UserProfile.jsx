@@ -2,78 +2,22 @@
 
 
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-
-const userData = {
-  'nisha.creates': {
-    name:'Nisha Kapoor', username:'nisha.creates',
-    avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)',
-    verified:true, bio:'Visual storyteller capturing golden hours ✨ Sony A7IV · Hyderabad 🇮🇳\nWorkshops · Presets · Collabs open',
-    website:'nisha.creates/presets', location:'Hyderabad, India',
-    posts:48, followers:84200, following:891,
-    totalReach:'1.2M', avgEngagement:'8.4%',
-    coverBg:'linear-gradient(135deg,#1a1208,#3d2b10,#1a0a05)',
-    isFollowing:false, mutualFollowers:['arjun.lens','maya.art','ananya.studio'],
-    category:'Photography',
-    posts_data:[
-      { emoji:'🌅', bg:'linear-gradient(135deg,#1a1208,#3d2b10)', likes:1842, comments:47 },
-      { emoji:'☕', bg:'linear-gradient(135deg,#1a1210,#3a2218)', likes:2156, comments:55 },
-      { emoji:'🎨', bg:'linear-gradient(135deg,#1a0f2a,#2a1a4a)', likes:3891, comments:98 },
-      { emoji:'🌿', bg:'linear-gradient(135deg,#0f1a0f,#1e3a1e)', likes:5103, comments:124 },
-      { emoji:'🏛', bg:'linear-gradient(135deg,#12120a,#2a2a10)', likes:1923, comments:41 },
-      { emoji:'🌌', bg:'linear-gradient(135deg,#0f0f1a,#1e1e3a)', likes:4201, comments:98 },
-      { emoji:'🌺', bg:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', likes:2847, comments:63 },
-      { emoji:'🌊', bg:'linear-gradient(135deg,#0a1a15,#1e3a30)', likes:3847, comments:77 },
-      { emoji:'🏙', bg:'linear-gradient(135deg,#1a1a12,#3a3a20)', likes:1654, comments:38 },
-    ]
-  },
-  'arjun.lens': {
-    name:'Arjun Lens', username:'arjun.lens',
-    avatar:'AL', gradient:'linear-gradient(135deg,#7eb8e8,#5a7a9e)',
-    verified:false, bio:'Street & night photography 🌃 Fujifilm X-T5\nMumbai → everywhere',
-    website:'arjunlens.com', location:'Mumbai, India',
-    posts:124, followers:41000, following:543,
-    totalReach:'480k', avgEngagement:'6.2%',
-    coverBg:'linear-gradient(135deg,#0a1520,#1e3a5f,#0a0a20)',
-    isFollowing:true, mutualFollowers:['nisha.creates','maya.art'],
-    category:'Street Photography',
-    posts_data:[
-      { emoji:'🌃', bg:'linear-gradient(135deg,#0a1520,#1e3a5f)', likes:3291, comments:89 },
-      { emoji:'🏙', bg:'linear-gradient(135deg,#1a1a12,#3a3a20)', likes:1654, comments:38 },
-      { emoji:'🌉', bg:'linear-gradient(135deg,#0a0a20,#1e1e4a)', likes:2140, comments:54 },
-      { emoji:'🌆', bg:'linear-gradient(135deg,#1a1208,#3d2b10)', likes:1892, comments:42 },
-      { emoji:'🌇', bg:'linear-gradient(135deg,#1a0f0f,#3a1e1e)', likes:2341, comments:61 },
-      { emoji:'🌁', bg:'linear-gradient(135deg,#0f0f1a,#2a2a3a)', likes:1203, comments:29 },
-    ]
-  },
-}
-
-const defaultUser = {
-  name:'Creator', username:'creator',
-  avatar:'CR', gradient:'linear-gradient(135deg,#888,#555)',
-  verified:false, bio:'Visual creator on Inspira',
-  website:'', location:'',
-  posts:12, followers:1240, following:234,
-  totalReach:'48k', avgEngagement:'4.1%',
-  coverBg:'linear-gradient(135deg,#1a1a1a,#2a2a2a)',
-  isFollowing:false, mutualFollowers:[],
-  category:'Creator',
-  posts_data:[
-    { emoji:'🌿', bg:'linear-gradient(135deg,#0f1a0f,#1e3a1e)', likes:241, comments:12 },
-    { emoji:'☕', bg:'linear-gradient(135deg,#1a1210,#3a2218)', likes:189, comments:8 },
-    { emoji:'🌅', bg:'linear-gradient(135deg,#1a1208,#3d2b10)', likes:312, comments:18 },
-  ]
-}
+import { getUserByUsername, followUser, unfollowUser } from '../config/api'
+import API from '../api/axios'
 
 export default function UserProfile() {
   const { username } = useParams()
   const navigate = useNavigate()
-  const user = userData[username] || { ...defaultUser, username: username || 'creator' }
+  const [user, setUser] = useState(null)
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const [following, setFollowing] = useState(user.isFollowing)
-  const [followersCount, setFollowersCount] = useState(user.followers)
+  const [following, setFollowing] = useState(false)
+  const [followersCount, setFollowersCount] = useState(0)
   const [activeTab, setActiveTab] = useState('posts')
   const [hoveredPost, setHoveredPost] = useState(null)
   const [showMessage, setShowMessage] = useState(false)
@@ -81,9 +25,50 @@ export default function UserProfile() {
   const [muted, setMuted] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
 
-  const toggleFollow = () => {
-    setFollowing(!following)
-    setFollowersCount(following ? followersCount - 1 : followersCount + 1)
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true)
+        const res = await getUserByUsername(username)
+        if (res.data.success) {
+          const userData = res.data.user
+          setUser(userData)
+          setFollowing(userData.followers?.includes(localStorage.getItem('userId')))
+          setFollowersCount(userData.followers?.length || 0)
+
+          // Fetch user's posts
+          const postsRes = await API.get(`/posts?author=${userData._id}`)
+          if (postsRes.data.success) {
+            setPosts(postsRes.data.posts)
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err)
+        setError('User not found')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (username) {
+      fetchUserData()
+    }
+  }, [username])
+
+  const toggleFollow = async () => {
+    try {
+      if (following) {
+        await unfollowUser(user._id)
+        setFollowing(false)
+        setFollowersCount(followersCount - 1)
+      } else {
+        await followUser(user._id)
+        setFollowing(true)
+        setFollowersCount(followersCount + 1)
+      }
+    } catch (err) {
+      console.error('Error toggling follow:', err)
+    }
   }
 
   const formatNum = n => {
@@ -93,10 +78,46 @@ export default function UserProfile() {
   }
 
   const tabs = [
-    { id:'posts', label:'Posts', count: user.posts },
+    { id:'posts', label:'Posts', count: posts.length },
     { id:'reels', label:'Reels' },
     { id:'tagged', label:'Tagged' },
   ]
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#fff', fontSize:'22px'
+      }}>
+        Loading Profile...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#ff5c5c', fontSize:'20px'
+      }}>
+        {error}
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#666', fontSize:'20px'
+      }}>
+        User not found
+      </div>
+    )
+  }
 
   return (
     <div style={{

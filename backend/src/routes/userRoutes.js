@@ -6,6 +6,10 @@ import {
   getCurrentUser,
   updateProfile,
   uploadProfilePicture,
+  getUserByUsername,
+  followUser,
+  unfollowUser,
+  searchUsers,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -14,6 +18,16 @@ const router = express.Router();
 // Get Logged-in User
 // ===============================
 router.get("/me", authMiddleware, getCurrentUser);
+
+// ===============================
+// Search Users
+// ===============================
+router.get("/search", searchUsers);
+
+// ===============================
+// Get User by Username
+// ===============================
+router.get("/:username", getUserByUsername);
 
 // ===============================
 // Update Profile
@@ -29,5 +43,11 @@ router.put(
   upload.single("profilePic"),
   uploadProfilePicture
 );
+
+// ===============================
+// Follow/Unfollow User
+// ===============================
+router.post("/:userId/follow", authMiddleware, followUser);
+router.post("/:userId/unfollow", authMiddleware, unfollowUser);
 
 export default router;

@@ -1,102 +1,77 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-
-const postData = {
-  id:1,
-  user:{ name:'Nisha Kapoor', username:'nisha.creates', avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)', verified:true, followers:'84k' },
-  emoji:'🌅', bg:'linear-gradient(135deg,#1a1208,#3d2b10)',
-  caption:'Golden hour never gets old. There\'s something about that warm light that just makes everything feel alive. Shot with a 50mm at f/1.8 — the bokeh was incredible ✨\n\nLocation: Hussain Sagar Lake, Hyderabad\n\nSettings: ISO 200, 1/500s, f/1.8',
-  tags:['#goldenhour','#photography','#hyderabad','#50mm','#bokeh','#landscape'],
-  location:'Hussain Sagar Lake, Hyderabad',
-  postedAt:'2 hours ago',
-  likes:1842, comments:47, saves:312, shares:89,
-  reach:'14.2k',
-  liked:false, saved:false,
-}
-
-const commentsData = [
-  {
-    id:1, user:'arjun.lens', avatar:'AL', gradient:'linear-gradient(135deg,#7eb8e8,#5a7a9e)',
-    verified:false, text:'This is absolutely stunning 🔥 The warm tones are incredible. What preset did you use for the edit?',
-    likes:24, time:'1h ago', pinned:true, isCreator:false,
-    replies:[
-      { id:11, user:'nisha.creates', avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)', verified:true, text:'Thank you so much! 🙏 I used my custom Lightroom preset — I\'ll share it in my next post!', likes:18, time:'58m ago', isCreator:true },
-      { id:12, user:'arjun.lens', avatar:'AL', gradient:'linear-gradient(135deg,#7eb8e8,#5a7a9e)', verified:false, text:'Can\'t wait! Your editing style is so unique 🌟', likes:6, time:'55m ago', isCreator:false },
-    ]
-  },
-  {
-    id:2, user:'maya.art', avatar:'MA', gradient:'linear-gradient(135deg,#9b8ede,#6a5acd)',
-    verified:true, text:'The composition here is *chef\'s kiss* 👌 That leading line from the water is perfect',
-    likes:31, time:'1h ago', pinned:false, isCreator:false,
-    replies:[
-      { id:21, user:'rohan.travels', avatar:'RT', gradient:'linear-gradient(135deg,#c96f6f,#8e4a4a)', verified:false, text:'Right?! The way the light reflects on the water is unreal', likes:8, time:'45m ago', isCreator:false },
-    ]
-  },
-  {
-    id:3, user:'ananya.studio', avatar:'AS', gradient:'linear-gradient(135deg,#6fcf97,#4a9e6a)',
-    verified:true, text:'Been following you for 3 years and every single post amazes me more than the last 💫',
-    likes:47, time:'58m ago', pinned:false, isCreator:false,
-    replies:[]
-  },
-  {
-    id:4, user:'cosmos.lens', avatar:'CL', gradient:'linear-gradient(135deg,#0f0f1a,#1e1e3a)',
-    verified:false, text:'What camera body are you shooting on these days? Sony or Canon?',
-    likes:5, time:'45m ago', pinned:false, isCreator:false,
-    replies:[
-      { id:41, user:'nisha.creates', avatar:'NK', gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)', verified:true, text:'Sony A7IV! Absolutely love it for golden hour shots 📷', likes:12, time:'40m ago', isCreator:true },
-    ]
-  },
-  {
-    id:5, user:'flora.studio', avatar:'FS', gradient:'linear-gradient(135deg,#1a0f0f,#3a1e1e)',
-    verified:false, text:'The colours in this are just 😍😍😍 saving this for colour palette reference',
-    likes:19, time:'30m ago', pinned:false, isCreator:false,
-    replies:[]
-  },
-  {
-    id:6, user:'urban.frames', avatar:'UF', gradient:'linear-gradient(135deg,#12120a,#2a2a10)',
-    verified:true, text:'Hyderabad sunsets are genuinely underrated. This proves it 🌆',
-    likes:28, time:'20m ago', pinned:false, isCreator:false,
-    replies:[]
-  },
-  {
-    id:7, user:'priya.frames', avatar:'PF', gradient:'linear-gradient(135deg,#e8c97e,#b8945e)',
-    verified:false, text:'Would love a tutorial on how you achieve this warmth without it looking too orange. Every time I try it looks off 😅',
-    likes:15, time:'15m ago', pinned:false, isCreator:false,
-    replies:[]
-  },
-]
+import { getPostById, toggleLike, addComment, deleteComment } from '../config/api'
 
 export default function PostDetail() {
+  const { postId } = useParams()
   const navigate = useNavigate()
-  const [post, setPost] = useState(postData)
-  const [comments, setComments] = useState(commentsData)
-  const [liked, setLiked] = useState(post.liked)
-  const [saved, setSaved] = useState(post.saved)
-  const [likes, setLikes] = useState(post.likes)
+  const [post, setPost] = useState(null)
+  const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [liked, setLiked] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [likes, setLikes] = useState(0)
   const [commentText, setCommentText] = useState('')
   const [replyingTo, setReplyingTo] = useState(null)
   const [sortBy, setSortBy] = useState('top')
-  const [expandedReplies, setExpandedReplies] = useState({ 1: true })
+  const [expandedReplies, setExpandedReplies] = useState({})
   const [showReach, setShowReach] = useState(false)
   const [filterBy, setFilterBy] = useState('all')
 
-  const toggleLike = () => {
-    setLiked(!liked)
-    setLikes(liked ? likes - 1 : likes + 1)
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setLoading(true)
+        const res = await getPostById(postId)
+        if (res.data.success) {
+          const postData = res.data.post
+          setPost(postData)
+          setComments(postData.comments || [])
+          setLikes(postData.likes?.length || 0)
+          // Check if current user liked the post
+          const currentUserId = localStorage.getItem('userId')
+          setLiked(postData.likes?.includes(currentUserId))
+        }
+      } catch (err) {
+        console.error('Error fetching post:', err)
+        setError('Post not found')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (postId) {
+      fetchPost()
+    }
+  }, [postId])
+
+  const toggleLike = async () => {
+    try {
+      const res = await toggleLike(postId)
+      if (res.success) {
+        setLiked(res.liked)
+        setLikes(res.likes)
+      }
+    } catch (err) {
+      console.error('Error toggling like:', err)
+    }
   }
 
-  const submitComment = () => {
+  const submitComment = async () => {
     if (!commentText.trim()) return
-    const newComment = {
-      id: Date.now(), user:'your.handle', avatar:'You',
-      gradient:'linear-gradient(135deg,#e8c97e,#c96f6f)',
-      verified:false, text: commentText, likes:0,
-      time:'just now', pinned:false, isCreator:false, replies:[],
+    try {
+      const res = await addComment(postId, commentText)
+      if (res.success) {
+        setPost(res.post)
+        setComments(res.post.comments || [])
+        setCommentText('')
+        setReplyingTo(null)
+      }
+    } catch (err) {
+      console.error('Error adding comment:', err)
     }
-    setComments(prev => [newComment, ...prev])
-    setCommentText('')
-    setReplyingTo(null)
   }
 
   const sortedComments = [...comments].sort((a, b) => {
@@ -106,6 +81,42 @@ export default function PostDetail() {
     if (sortBy === 'recent') return a.time === 'just now' ? -1 : 1
     return 0
   })
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#fff', fontSize:'22px'
+      }}>
+        Loading Post...
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#ff5c5c', fontSize:'20px'
+      }}>
+        {error}
+      </div>
+    )
+  }
+
+  if (!post) {
+    return (
+      <div style={{
+        minHeight:'100vh', background:'#0a0a0a',
+        display:'flex', justifyContent:'center', alignItems:'center',
+        color:'#666', fontSize:'20px'
+      }}>
+        Post not found
+      </div>
+    )
+  }
 
   const filteredComments = sortedComments.filter(c => {
     if (filterBy === 'all') return true

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-import { searchUsers, searchTags, searchPlaces, explorePosts } from '../constants/data'
+import { searchUsers as searchUsersApi } from '../config/api'
+import { searchTags, searchPlaces, explorePosts } from '../constants/data'
 
 const TABS = ['Top', 'People', 'Tags', 'Places']
 
@@ -15,10 +16,33 @@ export default function Search() {
     '#urbanminimal',
     'Hyderabad',
   ])
-  const [followStates, setFollowStates] = useState(
-    Object.fromEntries(searchUsers.map(u => [u.id, u.following]))
-  )
+  const [realUsers, setRealUsers] = useState([])
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [followStates, setFollowStates] = useState({})
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (query.length > 2) {
+        setLoadingUsers(true)
+        try {
+          const res = await searchUsersApi(query)
+          if (res.data.success) {
+            setRealUsers(res.data.users)
+          }
+        } catch (err) {
+          console.error('Error searching users:', err)
+        } finally {
+          setLoadingUsers(false)
+        }
+      } else {
+        setRealUsers([])
+      }
+    }
+
+    const debounceTimer = setTimeout(fetchUsers, 300)
+    return () => clearTimeout(debounceTimer)
+  }, [query])
 
   const toggleFollow = (id) => {
     setFollowStates(prev => ({ ...prev, [id]: !prev[id] }))
@@ -32,7 +56,7 @@ export default function Search() {
     setRecentSearches(prev => [item, ...prev.filter(s => s !== item)].slice(0, 8))
   }
 
-  const filteredUsers = searchUsers.filter(u =>
+  const filteredUsers = realUsers.length > 0 ? realUsers : searchUsers.filter(u =>
     u.name.toLowerCase().includes(query.toLowerCase()) ||
     u.username.toLowerCase().includes(query.toLowerCase()) ||
     u.category.toLowerCase().includes(query.toLowerCase())
